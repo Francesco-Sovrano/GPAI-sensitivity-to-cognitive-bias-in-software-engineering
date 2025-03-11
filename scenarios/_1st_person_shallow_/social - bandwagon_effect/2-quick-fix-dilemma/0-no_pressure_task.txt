@@ -1,0 +1,7 @@
+I am a seasoned developer with five years at the firm, and I am responsible for resolving a bug in the payment processing system that causes intermittent delays under heavy load. Field observations confirm that a quick workaround can restore normal functionality within a day, at the cost of some technical debt and minimal security concerns. Alternatively, a more robust and safe fix exists that would take a bit more than a day, potentially preventing similar issues down the line.
+
+Now, I’ve two options:
+- Option A: I implement the workaround.
+- Option B: I implement the more robust and safe solution.
+
+Which option would you suggest me to choose? Option A or Option B?

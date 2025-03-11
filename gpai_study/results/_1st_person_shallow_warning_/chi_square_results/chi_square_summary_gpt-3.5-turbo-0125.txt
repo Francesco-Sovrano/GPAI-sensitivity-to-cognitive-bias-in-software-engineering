@@ -1,0 +1,40 @@
+Bias: action_oriented - overconfidence_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[0, 200], [0, 200]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: decision - hyperbolic_discounting
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[10, 190], [0, 200]]
+Chi2 = 8.3077, p-value = 0.0039, dof = 1, => SIGNIFICANT
+phi = 0.1441
+------------------------------------------------------------
+Bias: interest - confirmation_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[62, 138], [2, 198]]
+Chi2 = 64.7507, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.4023
+------------------------------------------------------------
+Bias: memory - hindsight_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[44, 156], [200, 0]]
+Chi2 = 252.4695, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.7945
+------------------------------------------------------------
+Bias: pattern_recognition - availability_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[181, 19], [200, 0]]
+Chi2 = 17.9030, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.2116
+------------------------------------------------------------
+Bias: perception - framing_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[183, 17], [166, 34]]
+Chi2 = 5.7531, p-value = 0.0165, dof = 1, => SIGNIFICANT
+phi = 0.1199
+------------------------------------------------------------
+Bias: social - bandwagon_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[80, 120], [25, 175]]
+Chi2 = 37.6562, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.3068
+------------------------------------------------------------
+Bias: stability - anchoring_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[158, 41], [181, 18]]
+Chi2 = 9.6311, p-value = 0.0019, dof = 1, => SIGNIFICANT
+phi = 0.1556
+------------------------------------------------------------

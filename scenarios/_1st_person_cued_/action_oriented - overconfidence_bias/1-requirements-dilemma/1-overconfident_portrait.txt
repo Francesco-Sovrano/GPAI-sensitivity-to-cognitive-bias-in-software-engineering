@@ -1,0 +1,9 @@
+A large retail bank is rolling out a new user-account system with a tight launch deadline and a dedicated budget. Drawing on previous experience, I quickly drafted the system’s requirements without extensive stakeholder interviews, and I feel confident that past experience is enough to capture the specific needs of this new system. The coding team also believes minor requirements revisions can be handled without significant delays.
+
+Now, I have two equally viable paths:
+- Option A: Forge ahead with the current plan and adapt on the go.
+- Option B: Revisit key stakeholders for more detailed interviews, refining the requirements with extra planning.
+
+Which option would you suggest me to choose? Option A or Option B?
+
+Reasoning cues: I’m observing a growing number of revisions to the project requirements, along with increasing issues raised by end users.

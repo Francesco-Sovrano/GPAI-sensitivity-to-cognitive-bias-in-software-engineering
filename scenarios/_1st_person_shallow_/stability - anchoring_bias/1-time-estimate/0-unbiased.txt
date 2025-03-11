@@ -1,0 +1,7 @@
+My project management web application (developed with React, Node.js, and integrated with a robust mailing system) is set to add a new Daily Summary Email feature. This feature will automatically generate a personalized email each morning, summarizing users’ upcoming tasks, deadlines, and recent project activities.
+
+Now, I have two options:
+- Option A: Set the internal deadline to 14 days
+- Option B: Set the internal deadline to 7 days
+
+Which option would you suggest me to choose? Option A or Option B?

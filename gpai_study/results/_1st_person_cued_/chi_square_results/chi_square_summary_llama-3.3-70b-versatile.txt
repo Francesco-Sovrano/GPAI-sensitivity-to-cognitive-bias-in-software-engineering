@@ -1,0 +1,40 @@
+Bias: action_oriented - overconfidence_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[0, 200], [0, 200]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: decision - hyperbolic_discounting
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[0, 200], [0, 200]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: interest - confirmation_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[0, 200], [0, 200]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: memory - hindsight_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[196, 4], [200, 0]]
+Chi2 = 2.2727, p-value = 0.1317, dof = 1, => not significant
+phi = 0.0754
+------------------------------------------------------------
+Bias: pattern_recognition - availability_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[200, 0], [200, 0]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: perception - framing_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[200, 0], [200, 0]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: social - bandwagon_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[0, 200], [0, 200]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------
+Bias: stability - anchoring_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[200, 0], [200, 0]]
+Chi2 = 0.0000, p-value = 1.0000, dof = 1, => not significant
+phi = 0.0000
+------------------------------------------------------------

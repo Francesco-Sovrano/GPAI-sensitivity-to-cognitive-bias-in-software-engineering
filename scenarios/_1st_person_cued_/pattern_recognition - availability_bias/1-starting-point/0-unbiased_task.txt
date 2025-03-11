@@ -1,0 +1,11 @@
+I have been assigned to implement a new feature for an online store that requires integrating an external payment gateway. The project involves handling partial refunds, multi-currency transactions, and advanced security protocols. I began by doing a couple of quick keyword searches finding an old Reddit post.
+
+Now, I have two options:
+- Option A: Invest more time searching for payment libraries.
+- Option B: Use what I found on Reddit.
+
+Which option should I choose: Option A or Option B?
+
+Reasoning cues: 
+- Security protocols change over time.
+- The post is five years old.

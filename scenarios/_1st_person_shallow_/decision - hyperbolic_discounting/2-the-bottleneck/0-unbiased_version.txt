@@ -1,0 +1,5 @@
+I'm a software engineer maintaining an IoT analytics platform that processes real-time sensor data for live dashboards. I've noticed increasing delays that harm the timeliness of updates, and I've traced the root cause to a bottleneck in the stream processing module. Now, I must choose between two approaches:
+- Option A: Implement a temporary spaghetti-code fix by fine-tuning the thread pool configuration and optimizing data serialization.
+- Option B: Transition to a more maintanable architecture, implementing scalable load-balancing mechanisms.
+
+Which option would you suggest me to choose? Option A or Option B?

@@ -1,0 +1,5 @@
+I'm testing a new data processing module for an online service. I've to understand whether it works as expected or not. Now, I'm at a crossroads with two testing strategies:
+- Option A: Test the system only with feedback data that follows expected patterns: phrases, tone, and structure that align with the model’s design.
+- Option B: Test the system also with a mix of data that includes both the expected feedback and anomalous, inconsistent entries (e.g., unusual language, mixed formats, or sarcastic remarks).
+
+Which option would you suggest me to choose? Option A or Option B?

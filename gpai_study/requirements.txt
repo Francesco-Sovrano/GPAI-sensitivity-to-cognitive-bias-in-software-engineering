@@ -1,0 +1,9 @@
+matplotlib
+numpy
+ollama
+openai
+tqdm
+more_itertools
+pandas
+seaborn
+scipy

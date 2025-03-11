@@ -1,0 +1,5 @@
+My project has 6 critical bugs after a release. I can only pursue one of the following two fix strategies:
+- Option A: Apply a quick patch to definitely fix 5 out of the 6 bugs immediately (a guaranteed partial gain).
+- Option B: Undertake a comprehensive refactor with a 1/3 chance to fix all 6 bugs (full success) but a 2/3 chance to fix 0 bugs.
+
+Which option would you suggest me to choose? Option A or Option B?
