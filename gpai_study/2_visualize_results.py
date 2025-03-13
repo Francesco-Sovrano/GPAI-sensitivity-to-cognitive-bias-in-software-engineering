@@ -267,6 +267,11 @@ def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_
 
 	# Print the results in a formatted output
 	pivot_total = pivot_correct + pivot_incorrect
+	# Save the DataFrame to a CSV file
+	technique_label = prompt_label if prompt_label else (args.reasoning if args.reasoning == 'cued' else "base")
+	pivot_total.to_csv(os.path.join(csv_file_dir, f'sensitivity_scores_{technique_label}.csv'), index=True)
+
+	print('-'*20)
 	print("Mean sensitivity per model:")
 	for model, avg in pivot_total.mean(axis=0).items():
 		print(f"{model:15s}: {avg:.2f}%")
@@ -275,11 +280,11 @@ def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_
 		print(f"{model:15s}: {avg:.2f}%")
 
 	print("Mean sensitivity per bias:")
-	for model, avg in pivot_total.mean(axis=1).items():
-		print(f"{model:15s}: {avg:.2f}%")
+	for bias, avg in pivot_total.mean(axis=1).items():
+		print(f"{bias:15s}: {avg:.2f}%")
 	print("Median sensitivity per bias:")
-	for model, avg in pivot_total.median(axis=1).items():
-		print(f"{model:15s}: {avg:.2f}%")
+	for bias, avg in pivot_total.median(axis=1).items():
+		print(f"{bias:15s}: {avg:.2f}%")
 	
 	# Reorder columns to match desired order
 	pivot_correct = pivot_correct[[m for m in ordered_models if m in pivot_correct.columns]]

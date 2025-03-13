@@ -1,0 +1,9 @@
+bias,deepseek-r1-qwen,gpt-3.5-turbo,gpt-4o,gpt-4o-mini,llama3.3
+action_oriented - overconfidence_bias,10.318809776833156,0.0,0.0,0.0,0.0
+decision - hyperbolic_discounting,9.844929606202815,5.0,47.0,31.5,0.0
+interest - confirmation_bias,3.469521741326196,30.86,0.0,0.5,0.0
+memory - hindsight_bias,56.11025016603941,78.0,21.5,96.0,33.0
+pattern_recognition - availability_bias,62.98223963084187,9.5,42.0,51.0,27.500000000000004
+perception - framing_effect,2.4746224938134436,21.31,0.0,4.0,0.0
+social - bandwagon_effect,31.377203171556992,35.0,61.5,52.5,2.0
+stability - anchoring_bias,10.317542946382092,26.266350184334122,2.4800000000000004,0.5,0.5

@@ -1,0 +1,9 @@
+bias,deepseek-r1-qwen,gpt-3.5-turbo,gpt-4o,gpt-4o-mini,llama3.3
+action_oriented - overconfidence_bias,0.0,0.0,0.0,0.0,0.0
+decision - hyperbolic_discounting,0.0,0.5,0.0,0.0,0.0
+interest - confirmation_bias,0.0,2.9998484925003788,0.0,0.0,0.0
+memory - hindsight_bias,8.662715794898222,5.5,1.5,42.0,2.0
+pattern_recognition - availability_bias,9.09090909090909,2.5,0.0,0.0,0.0
+perception - framing_effect,0.0,0.0,0.0,0.0,0.0
+social - bandwagon_effect,15.635573960911064,3.0,29.5,5.890000000000001,0.0
+stability - anchoring_bias,0.0,7.609999999999999,0.0,0.0,0.0

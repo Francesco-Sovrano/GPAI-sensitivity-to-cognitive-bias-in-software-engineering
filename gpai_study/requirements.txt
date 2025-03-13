@@ -7,3 +7,4 @@ more_itertools
 pandas
 seaborn
 scipy
+Jinja2

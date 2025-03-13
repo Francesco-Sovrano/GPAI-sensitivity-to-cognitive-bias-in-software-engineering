@@ -133,3 +133,7 @@ python 3_chi_squared_analysis.py --model deepseek-r1-distill-qwen-32b --reasonin
 python 3_chi_squared_analysis.py --model gpt-4o-mini-2024-07-18 --reasoning cued
 python 3_chi_squared_analysis.py --model gpt-3.5-turbo-0125 --reasoning cued
 python 3_chi_squared_analysis.py --model gpt-4o-2024-08-06 --reasoning cued
+
+#####
+
+python 4_global_sensitivity_analysis.py
