@@ -1,5 +1,6 @@
 import pandas as pd
 from scipy.stats import wilcoxon
+import numpy as np
 
 # Load all files into dataframes
 base_df = pd.read_csv('./results/_1st_person_shallow_/sensitivity_scores_base.csv')
@@ -37,8 +38,8 @@ average_sensitivity = combined_df.groupby('Technique').mean(numeric_only=True).m
 
 # Presenting the results clearly
 average_sensitivity_df = pd.DataFrame({
-    'Technique': average_sensitivity.index,
-    'Average Sensitivity': average_sensitivity.values
+	'Technique': average_sensitivity.index,
+	'Average Sensitivity': average_sensitivity.values
 }).round(2).sort_values(by='Average Sensitivity', ascending=False)
 
 print("\nAverage Sensitivity:")
@@ -51,25 +52,41 @@ print(average_sensitivity_df)
 # Extract the Base scores in long format
 base_long = pivot_df[pivot_df['Technique'] == 'Base'][['bias', 'Model', 'Sensitivity']]
 
+def test_significance(technique, baseline):
+	alt_long = pivot_df[pivot_df['Technique'] == technique][['bias', 'Model', 'Sensitivity']]
+	# Merge on 'bias' and 'Model' to ensure paired observations
+	merged = pd.merge(baseline, alt_long, on=['bias', 'Model'], suffixes=('_base', '_alt'))
+	
+	# Perform Wilcoxon signed-rank test
+	stat, p_value = wilcoxon(merged['Sensitivity_base'], merged['Sensitivity_alt'], alternative='greater', zero_method='pratt')
+
+	# Compute the total sum of ranks for n pairs (T = n(n+1)/2)
+	n = len(merged)
+	T = n * (n + 1) / 2
+	# Compute the matched‑pairs rank biserial correlation effect size: r_rb = 2*(W/T) - 1
+	effect_size = 2 * (stat / T) - 1 if T != 0 else float('nan')
+	return {
+		'Technique': technique,
+		'Wilcoxon statistic': stat,
+		'p-value': round(p_value, 3),
+		'effect size (r)': round(effect_size, 3),
+		# 'sigificant': p_value < 0.05/(len(techniques)-1),
+	}
+
 results = []
 # Loop over each technique other than Base
 techniques = pivot_df['Technique'].unique()
 for technique in techniques:
-    if technique == 'Base':
-        continue
-    alt_long = pivot_df[pivot_df['Technique'] == technique][['bias', 'Model', 'Sensitivity']]
-    # Merge on 'bias' and 'Model' to ensure paired observations
-    merged = pd.merge(base_long, alt_long, on=['bias', 'Model'], suffixes=('_base', '_alt'))
-    
-    # Perform Wilcoxon signed-rank test
-    stat, p_value = wilcoxon(merged['Sensitivity_base'], merged['Sensitivity_alt'], alternative='greater')
-    results.append({
-        'Technique': technique,
-        'Wilcoxon statistic': stat,
-        'p-value': f"{p_value:.3f}",
-        'sigificant': p_value < 0.05/(len(techniques)-1),
-    })
+	if technique == 'Base':
+		continue
+	results.append(test_significance(technique, base_long))
 
 results_df = pd.DataFrame(results)
 print("\nNonparametric Test Results (Wilcoxon signed‑rank test vs Base):")
+print(results_df)
+
+
+results = [test_significance(technique, pivot_df[pivot_df['Technique'] == 'Imperative SD'][['bias', 'Model', 'Sensitivity']])]
+results_df = pd.DataFrame(results)
+print("\nNonparametric Test Results (Wilcoxon signed‑rank test vs Imperative Self-Debiasing):")
 print(results_df)
