@@ -21,10 +21,17 @@ parser.add_argument(
 parser.add_argument(
 	"--bias_warning_in_system_instruction",
 	action="store_true",
-	help="Flag to control whether to show figures (default: False)"
 )
 parser.add_argument(
 	"--chain_of_thought",
+	action="store_true",
+)
+parser.add_argument(
+	"--impersonified_self_debiasing",
+	action="store_true",
+)
+parser.add_argument(
+	"--implication_prompting",
 	action="store_true",
 )
 parser.add_argument(
@@ -41,7 +48,17 @@ llm_options = {
 	'top_p': 1,
 }
 
-csv_file_dir = os.path.join("./results/", f"_{args.format}_{args.reasoning}_"+( 'warning_' if args.bias_warning_in_system_instruction else '')+('CoT_' if args.chain_of_thought else ''))
+prompt_label = ''
+if args.bias_warning_in_system_instruction:
+	prompt_label += 'warning_'
+if args.chain_of_thought:
+	prompt_label += 'CoT_'
+if args.impersonified_self_debiasing:
+	prompt_label += 'impersonified_self_debiasing_'
+if args.implication_prompting:
+	prompt_label += 'implication_prompting_'
+
+csv_file_dir = os.path.join('./results/', f"_{args.format}_{args.reasoning}_"+prompt_label)
 chi_file_dir = os.path.join(csv_file_dir, "chi_square_results")
 os.makedirs(chi_file_dir, exist_ok=True)
 

@@ -1,0 +1,40 @@
+Bias: action_oriented - overconfidence_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[1, 198], [3, 196]]
+Chi2 = 0.2525, p-value = 0.6153, dof = 1, => not significant
+phi = 0.0252
+------------------------------------------------------------
+Bias: decision - hyperbolic_discounting
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[23, 177], [1, 199]]
+Chi2 = 19.5479, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.2211
+------------------------------------------------------------
+Bias: interest - confirmation_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[57, 138], [2, 193]]
+Chi2 = 58.2334, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.3864
+------------------------------------------------------------
+Bias: memory - hindsight_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[26, 170], [194, 2]]
+Chi2 = 288.9135, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.8585
+------------------------------------------------------------
+Bias: pattern_recognition - availability_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[193, 2], [134, 61]]
+Chi2 = 63.6843, p-value = 0.0000, dof = 1, => SIGNIFICANT
+phi = 0.4041
+------------------------------------------------------------
+Bias: perception - framing_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[176, 14], [169, 21]]
+Chi2 = 1.1329, p-value = 0.2872, dof = 1, => not significant
+phi = 0.0546
+------------------------------------------------------------
+Bias: social - bandwagon_effect
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[89, 104], [58, 135]]
+Chi2 = 9.8881, p-value = 0.0017, dof = 1, => SIGNIFICANT
+phi = 0.1601
+------------------------------------------------------------
+Bias: stability - anchoring_bias
+Obs counts (Biased vs Non-Biased, Option A vs Option B): [[147, 44], [150, 41]]
+Chi2 = 0.0605, p-value = 0.8057, dof = 1, => not significant
+phi = 0.0126
+------------------------------------------------------------

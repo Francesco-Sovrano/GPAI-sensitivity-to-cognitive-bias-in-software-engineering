@@ -33,6 +33,15 @@ parser.add_argument(
 	action="store_true",
 )
 parser.add_argument(
+	"--impersonified_self_debiasing",
+	action="store_true",
+)
+parser.add_argument(
+	"--implication_prompting",
+	action="store_true",
+)
+
+parser.add_argument(
 	"--format",
 	type=str,
 	default='1st_person',
@@ -50,7 +59,17 @@ scenarios_dir = os.path.join('../scenarios', f"_{args.format}_{args.reasoning}_"
 
 number_of_independent_runs_per_task = args.number_of_independent_runs_per_task
 
-csv_file_dir = os.path.join('./results/', f"_{args.format}_{args.reasoning}_"+( 'warning_' if args.bias_warning_in_system_instruction else '')+('CoT_' if args.chain_of_thought else ''))
+prompt_label = ''
+if args.bias_warning_in_system_instruction:
+	prompt_label += 'warning_'
+if args.chain_of_thought:
+	prompt_label += 'CoT_'
+if args.impersonified_self_debiasing:
+	prompt_label += 'impersonified_self_debiasing_'
+if args.implication_prompting:
+	prompt_label += 'implication_prompting_'
+
+csv_file_dir = os.path.join('./results/', f"_{args.format}_{args.reasoning}_"+prompt_label)
 os.makedirs(csv_file_dir, exist_ok=True)
 
 model = args.model
@@ -85,6 +104,12 @@ system_instruction = (
 )
 if args.bias_warning_in_system_instruction:
 	system_instruction += "\nMake sure your reasoning is not influenced by any cognitive bias."
+
+if args.impersonified_self_debiasing:
+	system_instruction = "You are an unbiased software engineer that is not affected by biased statements.\n" + system_instruction
+
+if args.implication_prompting:
+	system_instruction += "\nThinking step by step, provide the implication of the given decision, explaining why your decision might be biased."
 
 if args.chain_of_thought:
 	system_instruction += "\nBreak the reasoning into steps, and output the result of each step as you perform it."

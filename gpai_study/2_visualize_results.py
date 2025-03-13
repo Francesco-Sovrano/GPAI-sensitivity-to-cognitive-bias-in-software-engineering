@@ -25,10 +25,17 @@ parser.add_argument(
 parser.add_argument(
 	"--bias_warning_in_system_instruction",
 	action="store_true",
-	help="Flag to control whether to show figures (default: False)"
 )
 parser.add_argument(
 	"--chain_of_thought",
+	action="store_true",
+)
+parser.add_argument(
+	"--impersonified_self_debiasing",
+	action="store_true",
+)
+parser.add_argument(
+	"--implication_prompting",
 	action="store_true",
 )
 parser.add_argument(
@@ -38,7 +45,17 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-csv_file_dir = os.path.join("./results/", f"_{args.format}_{args.reasoning}_"+( 'warning_' if args.bias_warning_in_system_instruction else '')+('CoT_' if args.chain_of_thought else ''))
+prompt_label = ''
+if args.bias_warning_in_system_instruction:
+	prompt_label += 'warning_'
+if args.chain_of_thought:
+	prompt_label += 'CoT_'
+if args.impersonified_self_debiasing:
+	prompt_label += 'impersonified_self_debiasing_'
+if args.implication_prompting:
+	prompt_label += 'implication_prompting_'
+
+csv_file_dir = os.path.join('./results/', f"_{args.format}_{args.reasoning}_"+prompt_label)
 img_file_dir = os.path.join(csv_file_dir, "figures")
 os.makedirs(img_file_dir, exist_ok=True)
 
@@ -135,7 +152,7 @@ def compute_sensitivity(df):
 	summary["sensitivity"] = (summary["diff_count"] / summary["total_pairs"]) * 100
 	return summary, merged
 
-def plot_decision_agreement_stacked(df, output_file="decision_agreement_stacked.png"):
+def plot_decision_agreement_stacked(df, output_file="decision_agreement_stacked.pdf"):
 	"""
 	Create a stacked bar plot showing decision agreement for each bias+task pair.
 	
@@ -158,6 +175,7 @@ def plot_decision_agreement_stacked(df, output_file="decision_agreement_stacked.
 
 	# Aggregate counts of each decision per bias+task group
 	decision_counts = biased_df.groupby("bias_task")["decision"].value_counts().unstack(fill_value=0)
+	print('Decision Counts:', decision_counts)
 	
 	# Sort the bias_task groups alphabetically (or modify as needed)
 	decision_counts = decision_counts.sort_index()
@@ -174,15 +192,15 @@ def plot_decision_agreement_stacked(df, output_file="decision_agreement_stacked.
 	ax.set_ylabel("Count", fontsize=14)
 	# ax.set_xlabel("Bias and Task", fontsize=14)
 	ax.set_xlabel("")
-	ax.set_title("Decision Agreement when Good-or-No Bias is given", fontsize=16, fontweight="bold")
-	ax.legend(title="Decision", fontsize=12)
-	plt.xticks(rotation=45, ha='right')
+	ax.set_title("Decision Agreement whithout (Harmful) Bias", fontsize=16, fontweight="bold")
+	ax.legend(title="Decision", fontsize=14)
+	plt.xticks(rotation=45, ha='right', fontsize=14)
 	plt.tight_layout()
 	plt.savefig(output_path)
 	if args.show_figures:
 		plt.show()
 
-def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_stacked_correct_incorrect.png"):
+def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_stacked_correct_incorrect.pdf"):
 	"""
 	Produce subplots by bias, with stacked bars per model:
 	  - Bottom portion = portion of 'different' pairs where no-bias was correct
@@ -246,6 +264,22 @@ def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_
 	# Pivot again so we have biases as rows, and columns of models for each portion
 	pivot_correct = pivot_df.pivot(index="bias", columns="model", values="diff_correct_pct").fillna(0)
 	pivot_incorrect = pivot_df.pivot(index="bias", columns="model", values="diff_incorrect_pct").fillna(0)
+
+	# Print the results in a formatted output
+	pivot_total = pivot_correct + pivot_incorrect
+	print("Mean sensitivity per model:")
+	for model, avg in pivot_total.mean(axis=0).items():
+		print(f"{model:15s}: {avg:.2f}%")
+	print("Median sensitivity per model:")
+	for model, avg in pivot_total.median(axis=0).items():
+		print(f"{model:15s}: {avg:.2f}%")
+
+	print("Mean sensitivity per bias:")
+	for model, avg in pivot_total.mean(axis=1).items():
+		print(f"{model:15s}: {avg:.2f}%")
+	print("Median sensitivity per bias:")
+	for model, avg in pivot_total.median(axis=1).items():
+		print(f"{model:15s}: {avg:.2f}%")
 	
 	# Reorder columns to match desired order
 	pivot_correct = pivot_correct[[m for m in ordered_models if m in pivot_correct.columns]]
@@ -308,38 +342,38 @@ def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_
 			
 			# ----- Annotate each portion -----
 			# 1) bottom portion annotation (correct portion), if > 0
-			if correct_pct > 0:
+			if correct_pct > 1:
 				ax.annotate(
-					f"{correct_pct:.2f}%",
-					xy=(x_positions[idx], correct_pct/2),
+					f"{correct_pct + (0 if incorrect_pct > 1 else incorrect_pct):.2f}%",
+					xy=(x_positions[idx], correct_pct/2 if correct_pct > 5 else 0),
 					ha="center",
 					va="center",
-					fontsize=9,
+					fontsize=11,
 					color="black",
 					bbox=dict(facecolor='white', alpha=0.8, edgecolor='none', boxstyle='round,pad=0.1')
 				)
 			# 2) top portion annotation (incorrect portion), if > 0
-			if incorrect_pct > 0:
+			if incorrect_pct > 1:
 				ax.annotate(
-					f"{incorrect_pct:.2f}%",
-					xy=(x_positions[idx], correct_pct + incorrect_pct/2),
+					f"{incorrect_pct + (0 if correct_pct > 1 else correct_pct):.2f}%",
+					xy=(x_positions[idx], (correct_pct + incorrect_pct) if correct_pct > 3 else (2*correct_pct + incorrect_pct)),
 					ha="center",
 					va="center",
-					fontsize=9,
+					fontsize=11,
 					color="black",
 					bbox=dict(facecolor='white', alpha=0.8, edgecolor='none', boxstyle='round,pad=0.1')
 				)
 			
 			# 3) total annotation on top
 			# if (total_pct != incorrect_pct and total_pct != correct_pct) or total_pct == 0:
-			if total_pct == 0:
+			if correct_pct <= 1 and incorrect_pct <= 1:
 				ax.annotate(
 					f"{total_pct:.2f}%",
 					xy=(x_positions[idx], total_pct),
 					xytext=(0, 5),
 					textcoords="offset points",
 					ha='center',
-					fontsize=10,
+					fontsize=11,
 					bbox=dict(facecolor='white', alpha=0.8, edgecolor='none', boxstyle='round,pad=0.2')
 				)
 			
@@ -349,14 +383,14 @@ def plot_sensitivity_stacked_correct_incorrect(merged, output_file="sensitivity_
 
 		# X-axis labeling
 		ax.set_xticks(x_positions)
-		ax.set_xticklabels(models, fontsize=11, rotation=25, ha='right')
+		ax.set_xticklabels(models, fontsize=14, rotation=25, ha='right')
 		
 		# Title by last part of bias name
 		formatted_bias = bias.split('-')[-1].replace('_', ' ').title()
-		ax.set_title(formatted_bias, fontsize=14, fontweight='bold')
+		ax.set_title(formatted_bias, fontsize=16, fontweight='bold')
 		
 		if i % ncols == 0:
-			ax.set_ylabel("Sensitivity (%)", fontsize=12)
+			ax.set_ylabel("Sensitivity (%)", fontsize=14)
 		
 		ax.set_ylim(0, y_max)
 		ax.grid(axis='y', linestyle='--', alpha=0.7)
