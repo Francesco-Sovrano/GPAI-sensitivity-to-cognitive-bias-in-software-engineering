@@ -1,6 +1,6 @@
-# On the Sensitivity of General Purpose AI to Harmful Cognitive Bias in Software Engineering Tasks
+# Evaluating and Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering
 
-Welcome to the replication package for the ICSE 2025 paper titled "On the Sensitivity of General Purpose AI to Cognitive Bias in Software Engineering Tasks".
+Welcome to the replication package for the ICSE 2025 paper titled "Evaluating and Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering".
 
 ## Abstract
 
