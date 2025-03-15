@@ -9,6 +9,8 @@ cot_df = pd.read_csv('./results/_1st_person_shallow_CoT_/sensitivity_scores_CoT_
 isd_df = pd.read_csv('./results/_1st_person_shallow_impersonified_self_debiasing_/sensitivity_scores_impersonified_self_debiasing_.csv')
 ip_df = pd.read_csv('./results/_1st_person_shallow_implication_prompting_/sensitivity_scores_implication_prompting_.csv')
 warning_df = pd.read_csv('./results/_1st_person_shallow_warning_/sensitivity_scores_warning_.csv')
+# auto_cued_df = pd.read_csv('./results/_1st_person_shallow_auto_cued_/sensitivity_scores_auto_cued_.csv')
+# warning_auto_cued_df = pd.read_csv('./results/_1st_person_shallow_warning_auto_cued_/sensitivity_scores_warning_auto_cued_.csv')
 
 # Add a column to identify the technique
 base_df['Technique'] = 'Base'
@@ -16,7 +18,9 @@ cot_df['Technique'] = 'CoT'
 isd_df['Technique'] = 'Imperson. SD'
 ip_df['Technique'] = 'Implication Prompting'
 warning_df['Technique'] = 'Imperative SD'
-cued_df['Technique'] = 'Reason-Cue'
+cued_df['Technique'] = 'Manual-Cue'
+# auto_cued_df['Technique'] = 'Auto-Cue'
+# warning_auto_cued_df['Technique'] = 'Imperative SD + Auto-Cue'
 
 # Concatenate all dataframes
 combined_df = pd.concat([base_df, cot_df, isd_df, ip_df, warning_df, cued_df], ignore_index=True)
@@ -85,8 +89,8 @@ results_df = pd.DataFrame(results)
 print("\nNonparametric Test Results (Wilcoxon signed‑rank test vs Base):")
 print(results_df)
 
-
-results = [test_significance(technique, pivot_df[pivot_df['Technique'] == 'Imperative SD'][['bias', 'Model', 'Sensitivity']])]
-results_df = pd.DataFrame(results)
-print("\nNonparametric Test Results (Wilcoxon signed‑rank test vs Imperative Self-Debiasing):")
-print(results_df)
+for technique in ['Manual-Cue']:
+	results = [test_significance(technique, pivot_df[pivot_df['Technique'] == 'Imperative SD'][['bias', 'Model', 'Sensitivity']])]
+	results_df = pd.DataFrame(results)
+	print("\nNonparametric Test Results (Wilcoxon signed‑rank test vs Imperative Self-Debiasing):")
+	print(results_df)

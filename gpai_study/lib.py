@@ -149,20 +149,24 @@ def instruct_openai_model(prompts, system_instructions=None, api_key=None, base_
 		if prompt_max_tokens < 1:
 			return instruction_prompt, None
 		try:
-			response = chatgpt_client.chat.completions.create(
-				model=model,
-				messages=messages,
-				max_tokens=prompt_max_tokens,
-				n=n,
-				stop=None,
-				temperature=temperature,
-				top_p=top_p,
-				frequency_penalty=frequency_penalty, 
-				presence_penalty=presence_penalty
-			)
+			model_params = {
+				'model': model,
+				'messages': messages,
+				'n': n,
+				'stop': None,
+				'temperature': temperature,
+				'top_p': top_p,
+				'frequency_penalty': frequency_penalty, 
+				'presence_penalty': presence_penalty
+			}
+			if 'o1' in model or 'o3' in model:
+				model_params['max_completion_tokens'] = max_tokens
+			else:
+				model_params['max_tokens'] = max_tokens
+			response = chatgpt_client.chat.completions.create(**model_params)
 			# print(response.choices)
 			result = [
-				r.message.content.strip() 
+				r.message.content.strip()
 				for r in response.choices 
 				if r.message.content != 'Hello! It seems like your message might have been cut off. How can I assist you today?'
 			]
