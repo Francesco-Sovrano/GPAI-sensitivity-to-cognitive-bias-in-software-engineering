@@ -63,19 +63,17 @@ model_mapping = {
 # -----------------------------
 # short label → list of filename flag fragments appended as ".{flag}=True"
 strategy_mapping = {
-	"NONE": [],  # no strategy
-	# "AX": ["inject_axioms"], 
+	"None": [],  # no strategy
+	"AX": ["inject_axioms"], 
 	"BW": ["bias_warning_in_system_instruction"], 
 	"CoT": ["chain_of_thought"], 
-	"ISD": ["impersonified_self_debiasing"], 
+	"IsD": ["impersonified_self_debiasing"], 
 	"IMP": ["implication_prompting"], 
-	"2SAX": ["two_step_axioms_elicitation"], 
-	"1SAX": ["one_step_axioms_elicitation"], 
-	"2SAX+BW": ["bias_warning_in_system_instruction", "two_step_axioms_elicitation"], 
-	"1SAX+BW": ["bias_warning_in_system_instruction", "one_step_axioms_elicitation"],
+	"2sAX": ["two_step_axioms_elicitation"], 
+	"1sAX": ["one_step_axioms_elicitation"], 
+	"2sAX+BW": ["bias_warning_in_system_instruction", "two_step_axioms_elicitation"], 
+	"1sAX+BW": ["bias_warning_in_system_instruction", "one_step_axioms_elicitation"],
 }
-
-ordered_strategies = ["NONE", "BW", "CoT", "AX", "1SAX", "1SAX+BW", "2SAX", "2SAX+BW", "IMP", "ISD"]
 
 # -----------------------------
 # Data Loading
@@ -222,14 +220,14 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	# --- Mann-Whitney U + rank biserial effect size ---
 	rbs_results = {}
 	for s in unique_values:
-		if s == "NONE":
+		if s == "None":
 			rbs_results[s] = {"p": "-", "rbs": "0"}
 			continue
 
 		df_s = samples_df[samples_df[label_col] == s][[unit_col, value_col]].dropna().rename(
 			columns={value_col: "val_s"}
 		)
-		df_none = samples_df[samples_df[label_col] == "NONE"][[unit_col, value_col]].dropna().rename(
+		df_none = samples_df[samples_df[label_col] == "None"][[unit_col, value_col]].dropna().rename(
 			columns={value_col: "val_none"}
 		)
 		merged = pd.merge(df_s, df_none, on=unit_col, how="inner").sort_values(by=unit_col)
@@ -250,7 +248,7 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 
 	# --- Sort labels by ascending effect size (RBS) ---
 	def rbs_key(s):
-		if s == "NONE":
+		if s == "None":
 			return 0
 		v = rbs_results.get(s, {}).get("rbs")
 		return v if isinstance(v, (float, int)) and np.isfinite(v) else np.inf
@@ -261,8 +259,8 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	plt.figure(figsize=(10, 4))
 	x = np.arange(len(labels))
 
-	# prepare box colors: highlight "NONE"
-	box_colors = ["lightgray" if s == "NONE" else "white" for s in labels]
+	# prepare box colors: highlight "None"
+	box_colors = ["lightgray" if s == "None" else "white" for s in labels]
 
 	bp = plt.boxplot(
 		[data[s] for s in labels],
@@ -281,6 +279,33 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	plt.xticks(x, labels, rotation=0)
 	plt.ylabel("Sensitivity")
 	plt.title(title)
+
+	# --- Highlight the 'AX' tick (label + tick mark) ---
+	if "AX" in labels:
+		ax = plt.gca()
+		idx_ax = labels.index("AX")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
+
+	if "None" in labels:
+		ax = plt.gca()
+		idx_ax = labels.index("None")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:green")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:green")
+		tick_ax.tick2line.set_color("tab:green")
 
 	# --- Compute axis limits and spacing ---
 	finite_maxes = [np.nanmax(v) for v in data.values() if v.size]
@@ -376,19 +401,19 @@ def plot_heatmap(
 	if pivot_df.size == 0:
 		raise ValueError("No data to plot after grouping/pivot. Check 'bias', 'strategy', and value_col.")
 
-	# --- Ensure "NONE" is the last column ---
-	if "NONE" in pivot_df.columns:
-		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "NONE"] + ["NONE"]]
+	# --- Ensure "None" is the last column ---
+	if "None" in pivot_df.columns:
+		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "None"] + ["None"]]
 
-	# --- Compute p-values (strategy vs NONE per bias) ---
+	# --- Compute p-values (strategy vs None per bias) ---
 	pval_dict = {}
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "NONE":
+			if strat == "None":
 				pval_dict[(bias, strat)] = (None, 0)
 				continue
 			vals_strat = df[(df["bias"] == bias) & (df["strategy"] == strat)][value_col].dropna()
-			vals_none  = df[(df["bias"] == bias) & (df["strategy"] == "NONE")][value_col].dropna()
+			vals_none  = df[(df["bias"] == bias) & (df["strategy"] == "None")][value_col].dropna()
 			if len(vals_strat) > 0 and len(vals_none) > 0:
 				try:
 					stat, p = mannwhitneyu(vals_strat, vals_none, alternative="less")
@@ -399,13 +424,13 @@ def plot_heatmap(
 			else:
 				pval_dict[(bias, strat)] = (None, 0)
 
-	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "NONE") ---
+	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "None") ---
 	# Build an effect-size DataFrame aligned to pivot_df
 	effect_df = pivot_df.copy().astype(float)
 	effect_df.loc[:, :] = float("nan")
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "NONE":
+			if strat == "None":
 				continue
 			p, rbs = pval_dict.get((bias, strat), (None, float("nan")))
 			effect_df.loc[bias, strat] = (rbs if p is not None else float("nan"))
@@ -416,9 +441,9 @@ def plot_heatmap(
 		# per-row maximum absolute effect
 		row_max = effect_df.max(axis=1, skipna=True)
 		best_mask = effect_df.eq(row_max, axis=0)
-		# never select "NONE" as best
-		if "NONE" in best_mask.columns:
-			best_mask["NONE"] = False
+		# never select "None" as best
+		if "None" in best_mask.columns:
+			best_mask["None"] = False
 
 	# --- Tie-break: if multiple True in a row, keep the one with the lowest metric ---
 	# Uses the numeric values from pivot_df (underlying metric behind ann_df).
@@ -460,9 +485,9 @@ def plot_heatmap(
 
 	n_rows, n_cols = pivot_df.shape
 
-	# --- Small whitespace gap before "NONE" instead of a thick line ---
-	if "NONE" in pivot_df.columns:
-		none_idx = pivot_df.columns.get_loc("NONE")  # left edge of "NONE"
+	# --- Small whitespace gap before "None" instead of a thick line ---
+	if "None" in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc("None")  # left edge of "None"
 		gap = 0.12  # width of the gap in "cell" units; try 0.08–0.2
 		bg = ax.figure.get_facecolor()  # match the figure background
 		# Center a narrow band on the boundary (won't cover text centered in cells)
@@ -495,6 +520,31 @@ def plot_heatmap(
 					path_effects=ax.texts[i * n_cols + j].get_path_effects(),
 				)
 
+	# --- Highlight the 'AX' tick (label + tick mark) ---
+	if "AX" in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc("AX")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
+
+	if "None" in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc("None")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:green")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:green")
+		tick_ax.tick2line.set_color("tab:green")
+
 	plt.tight_layout()
 	plt.savefig(outpath, dpi=250)
 	if args.show_figures:
@@ -524,19 +574,19 @@ def plot_heatmap_by_strategy_tier_best(
 	if pivot_df.size == 0:
 		raise ValueError("No data to plot after grouping/pivot.")
 
-	# --- Ensure "NONE" is the last column ---
-	if "NONE" in pivot_df.columns:
-		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "NONE"] + ["NONE"]]
+	# --- Ensure "None" is the last column ---
+	if "None" in pivot_df.columns:
+		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "None"] + ["None"]]
 
-	# --- Compute p-values (strategy vs NONE per tier) ---
+	# --- Compute p-values (strategy vs None per tier) ---
 	pval_dict = {}
 	for tier in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "NONE":
+			if strat == "None":
 				pval_dict[(tier, strat)] = (None, 0)
 				continue
 			vals_strat = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == strat)][value_col].dropna()
-			vals_none = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == "NONE")][value_col].dropna()
+			vals_none = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == "None")][value_col].dropna()
 			if len(vals_strat) > 0 and len(vals_none) > 0:
 				try:
 					stat, p = mannwhitneyu(vals_strat, vals_none, alternative="less")
@@ -547,13 +597,13 @@ def plot_heatmap_by_strategy_tier_best(
 			else:
 				pval_dict[(tier, strat)] = (None, 0)
 
-	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "NONE") ---
+	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "None") ---
 	# Build an effect-size DataFrame aligned to pivot_df
 	effect_df = pivot_df.copy().astype(float)
 	effect_df.loc[:, :] = float("nan")
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "NONE":
+			if strat == "None":
 				continue
 			p, rbs = pval_dict.get((bias, strat), (None, float("nan")))
 			effect_df.loc[bias, strat] = (rbs if p is not None else float("nan"))
@@ -564,9 +614,9 @@ def plot_heatmap_by_strategy_tier_best(
 		# per-row maximum absolute effect
 		row_max = effect_df.max(axis=1, skipna=True)
 		best_mask = effect_df.eq(row_max, axis=0)
-		# never select "NONE" as best
-		if "NONE" in best_mask.columns:
-			best_mask["NONE"] = False
+		# never select "None" as best
+		if "None" in best_mask.columns:
+			best_mask["None"] = False
 
 	# --- Tie-break: if multiple True in a row, keep the one with the lowest metric ---
 	# Uses the numeric values from pivot_df (underlying metric behind ann_df).
@@ -608,9 +658,9 @@ def plot_heatmap_by_strategy_tier_best(
 
 	n_rows, n_cols = pivot_df.shape
 
-	# --- Small whitespace gap before "NONE" instead of a thick line ---
-	if "NONE" in pivot_df.columns:
-		none_idx = pivot_df.columns.get_loc("NONE")  # left edge of "NONE"
+	# --- Small whitespace gap before "None" instead of a thick line ---
+	if "None" in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc("None")  # left edge of "None"
 		gap = 0.12  # width of the gap in "cell" units; try 0.08–0.2
 		bg = ax.figure.get_facecolor()  # match the figure background
 		# Center a narrow band on the boundary (won't cover text centered in cells)
@@ -646,6 +696,31 @@ def plot_heatmap_by_strategy_tier_best(
 					# bbox=dict(facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.2")
 				)
 
+	# --- Highlight the 'AX' tick (label + tick mark) ---
+	if "AX" in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc("AX")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
+
+	if "None" in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc("None")
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:green")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:green")
+		tick_ax.tick2line.set_color("tab:green")
+
 	plt.tight_layout()
 	plt.savefig(outpath, dpi=250)
 	if args.show_figures:
@@ -678,7 +753,7 @@ def main():
 		strat_tier.to_csv(outdir / "means_by_tier_by_strategy.csv", index=False)
 
 	# Winners per bias (which strategy has highest sensitivity per bias after averaging over models)
-	per_bias_avg = (df[df['strategy'] != 'AX'].dropna(subset=['sensitivity'])
+	per_bias_avg = (df.dropna(subset=['sensitivity'])
 					  .groupby(['bias','strategy'])['sensitivity']
 					  .median()
 					  .reset_index())
