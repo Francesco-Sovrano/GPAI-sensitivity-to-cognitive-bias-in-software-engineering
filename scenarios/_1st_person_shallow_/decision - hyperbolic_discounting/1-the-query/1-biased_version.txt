@@ -1,5 +1,0 @@
-I'm a software engineer working on a mobile financial transactions app that powers real-time analytical dashboards. My current challenge is to extract a specific subset of data from an hashmap. However, I'm not familiar with the query interface needed to perform this extraction. This situation presents two options:
-- Option A: Manually collect the required data by iterating through all input statements. I can do this in one day.
-- Option B: Construct a query to retrieve the data from the hashmap efficiently. However, I know nothing about hashmap queries, so it will take me a week to learn it.
-
-Which option would you suggest me to choose? Option A or Option B?

@@ -1,0 +1,11 @@
+pandas
+tqdm
+more_itertools
+ollama
+openai
+sentence_transformers
+matplotlib
+seaborn
+statsmodels
+scikit-learn
+Levenshtein

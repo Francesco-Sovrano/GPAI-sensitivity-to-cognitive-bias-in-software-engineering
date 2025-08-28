@@ -1,0 +1,89 @@
+{
+    "discarded_dilemmas_count": 2960,
+    "discarded_dilemmas_count_by_bias": {
+        "confirmation bias": 191,
+        "hyperbolic discounting": 72,
+        "availability bias": 276,
+        "anchoring bias": 90,
+        "overconfidence bias": 1282,
+        "bandwagon effect": 692,
+        "framing effect": 236,
+        "hindsight bias": 121
+    },
+    "discarded_dilemmas_count_by_filter_by_bias": {
+        "confirmation bias": {
+            "intra_dilemma_similarity": 46,
+            "inter_dilemma_similarity": 7,
+            "bias_towards_incorrect": 36,
+            "logic": 36,
+            "prolog2text_alignment": 41,
+            "output_matching": 25
+        },
+        "hyperbolic discounting": {
+            "intra_dilemma_similarity": 46,
+            "inter_dilemma_similarity": 2,
+            "bias_towards_incorrect": 1,
+            "logic": 12,
+            "prolog2text_alignment": 6,
+            "output_matching": 5
+        },
+        "availability bias": {
+            "intra_dilemma_similarity": 120,
+            "inter_dilemma_similarity": 6,
+            "bias_towards_incorrect": 77,
+            "logic": 29,
+            "prolog2text_alignment": 29,
+            "output_matching": 15
+        },
+        "anchoring bias": {
+            "intra_dilemma_similarity": 10,
+            "inter_dilemma_similarity": 7,
+            "bias_towards_incorrect": 30,
+            "logic": 16,
+            "prolog2text_alignment": 22,
+            "output_matching": 5
+        },
+        "overconfidence bias": {
+            "intra_dilemma_similarity": 273,
+            "inter_dilemma_similarity": 6,
+            "bias_towards_incorrect": 23,
+            "logic": 811,
+            "prolog2text_alignment": 118,
+            "output_matching": 51
+        },
+        "bandwagon effect": {
+            "intra_dilemma_similarity": 150,
+            "inter_dilemma_similarity": 12,
+            "bias_towards_incorrect": 70,
+            "logic": 259,
+            "prolog2text_alignment": 155,
+            "output_matching": 46
+        },
+        "framing effect": {
+            "intra_dilemma_similarity": 44,
+            "inter_dilemma_similarity": 1,
+            "bias_towards_incorrect": 4,
+            "logic": 104,
+            "prolog2text_alignment": 29,
+            "output_matching": 54
+        },
+        "hindsight bias": {
+            "intra_dilemma_similarity": 75,
+            "inter_dilemma_similarity": 0,
+            "bias_towards_incorrect": 24,
+            "logic": 16,
+            "prolog2text_alignment": 4,
+            "output_matching": 2
+        }
+    },
+    "n_generated_pairs": {
+        "confirmation bias": 101,
+        "hyperbolic discounting": 100,
+        "availability bias": 101,
+        "anchoring bias": 102,
+        "overconfidence bias": 100,
+        "bandwagon effect": 100,
+        "framing effect": 101,
+        "hindsight bias": 101
+    }
+}

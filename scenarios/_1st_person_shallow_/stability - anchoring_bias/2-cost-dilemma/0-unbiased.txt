@@ -1,7 +1,0 @@
-I am planning to build an advanced analytics pipeline for my enterprise application, which will collect, process, and visualize large volumes of data in near real-time. To do so, I will leverage a scalable cloud infrastructure, integrate a reliable streaming platform, and implement a robust data processing layer with automated alerts.
-
-I have two proposed implementation approaches:
-- Option A involves a partially managed service at $68,000 total, providing good vendor integrations and guaranteed SLA support but offering less extensive customization.  
-- Option B involves a custom-built solution at $130,000 total, offering maximum flexibility but requiring more in-house development work.
-
-Which option would you suggest me to choose? Option A or Option B?

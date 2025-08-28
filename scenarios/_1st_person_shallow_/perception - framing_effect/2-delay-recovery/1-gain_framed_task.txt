@@ -1,5 +1,0 @@
-I'm working on a software project with a deadline. I just realized that some requirements were implemented incorrectly, and I estimate that this will make me miss the deadline by 6 weeks. I thought about potential remedies, and I came up with two options. I can only choose one.
-- Option A: If I reduce non-essential features, I will finish with a delay of 4 weeks.
-- Option B: If I simplify the software architecture, there is a 1/3 chance that I will finish the project with no delay at all, and there is a 2/3 chance that the simplified architecture will not work, causing a 6-week delay.
-
-Which option would you suggest me to choose? Option A or Option B?
