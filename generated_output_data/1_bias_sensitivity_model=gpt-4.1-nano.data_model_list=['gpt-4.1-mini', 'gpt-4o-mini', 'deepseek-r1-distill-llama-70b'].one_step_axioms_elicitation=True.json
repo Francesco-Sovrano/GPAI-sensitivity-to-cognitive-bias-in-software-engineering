@@ -1,0 +1,434 @@
+{
+    "confirmation bias": {
+        "sensitivity": 9.726027397260275,
+        "harmfulness": 12.73972602739726,
+        "total_runs": 1460,
+        "prolog_uncertainty": 4.10958904109589,
+        "average_semantic_similarity_of_dilemmas": 0.33870378136634827,
+        "average_levenshtein_distance_of_dilemmas": 0.3789385310167363,
+        "complexity_analysis": {
+            "low": {
+                "total_runs": 495,
+                "sensitivity": 5.05050505050505,
+                "harmfulness": 5.656565656565657,
+                "prolog_uncertainty": 0.6060606060606061,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 625,
+                "sensitivity": 4.96,
+                "harmfulness": 5.28,
+                "prolog_uncertainty": 1.28,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 115,
+                "sensitivity": 6.086956521739131,
+                "harmfulness": 10.434782608695652,
+                "prolog_uncertainty": 4.3478260869565215,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "high": {
+                "total_runs": 225,
+                "sensitivity": 35.11111111111111,
+                "harmfulness": 50.22222222222222,
+                "prolog_uncertainty": 19.555555555555557,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "hyperbolic discounting": {
+        "sensitivity": 17.671232876712327,
+        "harmfulness": 21.164383561643834,
+        "total_runs": 1460,
+        "prolog_uncertainty": 4.315068493150685,
+        "average_semantic_similarity_of_dilemmas": 0.36036908626556396,
+        "average_levenshtein_distance_of_dilemmas": 0.40378202302256067,
+        "complexity_analysis": {
+            "low": {
+                "total_runs": 1275,
+                "sensitivity": 18.509803921568626,
+                "harmfulness": 22.274509803921568,
+                "prolog_uncertainty": 4.549019607843137,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 125,
+                "sensitivity": 12.8,
+                "harmfulness": 16.0,
+                "prolog_uncertainty": 3.2,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 40,
+                "sensitivity": 2.5,
+                "harmfulness": 0.0,
+                "prolog_uncertainty": 2.5,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "high": {
+                "total_runs": 20,
+                "sensitivity": 25.0,
+                "harmfulness": 25.0,
+                "prolog_uncertainty": 0.0,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "availability bias": {
+        "sensitivity": 6.301369863013699,
+        "harmfulness": 9.315068493150685,
+        "total_runs": 1460,
+        "prolog_uncertainty": 4.794520547945205,
+        "average_semantic_similarity_of_dilemmas": 0.3404207229614258,
+        "average_levenshtein_distance_of_dilemmas": 0.36142660282117833,
+        "complexity_analysis": {
+            "low": {
+                "total_runs": 690,
+                "sensitivity": 4.63768115942029,
+                "harmfulness": 6.3768115942028984,
+                "prolog_uncertainty": 3.768115942028986,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "high": {
+                "total_runs": 240,
+                "sensitivity": 15.0,
+                "harmfulness": 22.083333333333332,
+                "prolog_uncertainty": 7.916666666666666,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 285,
+                "sensitivity": 4.2105263157894735,
+                "harmfulness": 9.12280701754386,
+                "prolog_uncertainty": 8.421052631578947,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 245,
+                "sensitivity": 4.8979591836734695,
+                "harmfulness": 5.3061224489795915,
+                "prolog_uncertainty": 0.40816326530612246,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "anchoring bias": {
+        "sensitivity": 3.493150684931507,
+        "harmfulness": 4.52054794520548,
+        "total_runs": 1460,
+        "prolog_uncertainty": 1.0273972602739725,
+        "average_semantic_similarity_of_dilemmas": 0.3674003779888153,
+        "average_levenshtein_distance_of_dilemmas": 0.35946130960813255,
+        "complexity_analysis": {
+            "high": {
+                "total_runs": 305,
+                "sensitivity": 8.19672131147541,
+                "harmfulness": 9.836065573770492,
+                "prolog_uncertainty": 1.639344262295082,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 475,
+                "sensitivity": 1.0526315789473684,
+                "harmfulness": 2.1052631578947367,
+                "prolog_uncertainty": 1.0526315789473684,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 475,
+                "sensitivity": 3.578947368421052,
+                "harmfulness": 4.631578947368421,
+                "prolog_uncertainty": 1.0526315789473684,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "low": {
+                "total_runs": 205,
+                "sensitivity": 1.951219512195122,
+                "harmfulness": 1.951219512195122,
+                "prolog_uncertainty": 0.0,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "overconfidence bias": {
+        "sensitivity": 6.181318681318682,
+        "harmfulness": 7.417582417582418,
+        "total_runs": 1456,
+        "prolog_uncertainty": 2.0604395604395602,
+        "average_semantic_similarity_of_dilemmas": 0.4083915054798126,
+        "average_levenshtein_distance_of_dilemmas": 0.40143879830395734,
+        "complexity_analysis": {
+            "high": {
+                "total_runs": 345,
+                "sensitivity": 6.666666666666667,
+                "harmfulness": 6.956521739130435,
+                "prolog_uncertainty": 2.608695652173913,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 455,
+                "sensitivity": 6.593406593406594,
+                "harmfulness": 8.35164835164835,
+                "prolog_uncertainty": 2.197802197802198,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "low": {
+                "total_runs": 210,
+                "sensitivity": 4.285714285714286,
+                "harmfulness": 6.190476190476191,
+                "prolog_uncertainty": 2.857142857142857,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 446,
+                "sensitivity": 6.278026905829597,
+                "harmfulness": 7.399103139013453,
+                "prolog_uncertainty": 1.1210762331838564,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "bandwagon effect": {
+        "sensitivity": 9.452054794520548,
+        "harmfulness": 9.58904109589041,
+        "total_runs": 1460,
+        "prolog_uncertainty": 4.2465753424657535,
+        "average_semantic_similarity_of_dilemmas": 0.3784138560295105,
+        "average_levenshtein_distance_of_dilemmas": 0.3695742335685483,
+        "complexity_analysis": {
+            "high": {
+                "total_runs": 280,
+                "sensitivity": 19.28571428571429,
+                "harmfulness": 19.642857142857142,
+                "prolog_uncertainty": 8.214285714285714,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 430,
+                "sensitivity": 8.372093023255815,
+                "harmfulness": 12.325581395348838,
+                "prolog_uncertainty": 4.4186046511627906,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "low": {
+                "total_runs": 440,
+                "sensitivity": 4.318181818181818,
+                "harmfulness": 2.272727272727273,
+                "prolog_uncertainty": 2.0454545454545454,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 310,
+                "sensitivity": 9.35483870967742,
+                "harmfulness": 7.096774193548387,
+                "prolog_uncertainty": 3.5483870967741935,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "framing effect": {
+        "sensitivity": 15.479452054794521,
+        "harmfulness": 16.301369863013697,
+        "total_runs": 1460,
+        "prolog_uncertainty": 1.7808219178082192,
+        "average_semantic_similarity_of_dilemmas": 0.4196164608001709,
+        "average_levenshtein_distance_of_dilemmas": 0.3862334447599084,
+        "complexity_analysis": {
+            "high": {
+                "total_runs": 875,
+                "sensitivity": 19.085714285714285,
+                "harmfulness": 20.685714285714283,
+                "prolog_uncertainty": 2.742857142857143,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "low": {
+                "total_runs": 220,
+                "sensitivity": 0.0,
+                "harmfulness": 0.0,
+                "prolog_uncertainty": 0.0,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-high": {
+                "total_runs": 190,
+                "sensitivity": 17.36842105263158,
+                "harmfulness": 16.315789473684212,
+                "prolog_uncertainty": 1.0526315789473684,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 175,
+                "sensitivity": 14.857142857142858,
+                "harmfulness": 14.857142857142858,
+                "prolog_uncertainty": 0.0,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    },
+    "hindsight bias": {
+        "sensitivity": 18.561643835616437,
+        "harmfulness": 16.986301369863014,
+        "total_runs": 1460,
+        "prolog_uncertainty": 2.5342465753424657,
+        "average_semantic_similarity_of_dilemmas": 0.44437727332115173,
+        "average_levenshtein_distance_of_dilemmas": 0.3599795206629775,
+        "complexity_analysis": {
+            "mid-high": {
+                "total_runs": 800,
+                "sensitivity": 18.0,
+                "harmfulness": 17.25,
+                "prolog_uncertainty": 2.25,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "high": {
+                "total_runs": 320,
+                "sensitivity": 14.374999999999998,
+                "harmfulness": 14.0625,
+                "prolog_uncertainty": 0.3125,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "mid-low": {
+                "total_runs": 320,
+                "sensitivity": 23.4375,
+                "harmfulness": 19.6875,
+                "prolog_uncertainty": 4.375,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            },
+            "low": {
+                "total_runs": 20,
+                "sensitivity": 30.0,
+                "harmfulness": 10.0,
+                "prolog_uncertainty": 20.0,
+                "quartiles": [
+                    4.0,
+                    7.0,
+                    11.0
+                ]
+            }
+        }
+    }
+}
