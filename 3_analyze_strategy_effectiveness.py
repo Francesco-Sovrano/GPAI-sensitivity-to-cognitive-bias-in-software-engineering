@@ -12,9 +12,12 @@ from scipy.stats import wilcoxon, mannwhitneyu, ranksums
 # -----------------------------
 # Matplotlib for figures
 # -----------------------------
+from matplotlib.colors import PowerNorm
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 import matplotlib.patheffects as pe
+from matplotlib.ticker import FuncFormatter
+import matplotlib.ticker as mtick
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 mpl.rcParams['pdf.fonttype'] = 42
@@ -62,17 +65,24 @@ model_mapping = {
 # Prompting Strategy Mapping (no CLI flags!)
 # -----------------------------
 # short label → list of filename flag fragments appended as ".{flag}=True"
+NO_STRATEGY_LABEL = "Ø"
+PROBE_AXIOMS_INJECTION_LABEL = 'ProbeAX'
 strategy_mapping = {
-	"None": [],  # no strategy
-	"AX": ["inject_axioms"], 
-	"BW": ["bias_warning_in_system_instruction"], 
+	## No strategy
+	NO_STRATEGY_LABEL: [],  # no strategy
+	PROBE_AXIOMS_INJECTION_LABEL: ["inject_axioms"], # cueing with axioms (not a debiasing strategy)
+	## Baseline prompting strategies
 	"CoT": ["chain_of_thought"], 
-	"IsD": ["impersonified_self_debiasing"], 
 	"IMP": ["implication_prompting"], 
-	"2sAX": ["two_step_axioms_elicitation"], 
-	"1sAX": ["one_step_axioms_elicitation"], 
-	"2sAX+BW": ["bias_warning_in_system_instruction", "two_step_axioms_elicitation"], 
-	"1sAX+BW": ["bias_warning_in_system_instruction", "one_step_axioms_elicitation"],
+	"IsD": ["impersonified_self_debiasing"], 
+	"BW": ["bias_warning_in_system_instruction"], 
+	## Our prompting strategies
+	"2sAX": ["two_steps_self_axioms_elicitation"], 
+	"2sAX/BW": ["bias_warning_in_system_instruction", "two_steps_self_axioms_elicitation"], 
+	"sAX": ["self_axioms_elicitation"], 
+	"sAX/BW": ["bias_warning_in_system_instruction", "self_axioms_elicitation"],
+	"sAX/2sAX/BW": ["bias_warning_in_system_instruction", "two_steps_self_axioms_elicitation", "self_axioms_elicitation"], 
+	"sAX/BW/IsD": ["bias_warning_in_system_instruction","impersonified_self_debiasing","self_axioms_elicitation"],	
 }
 
 # -----------------------------
@@ -166,6 +176,15 @@ def expand_complexity_tiers(df):
 def _ensure_outdir(d):
 	d.mkdir(parents=True, exist_ok=True)
 
+def _ordered_strategy_columns(cols):
+	"""Return strategy columns ordered like strategy_mapping (respecting --strategies if given)."""
+	base = list(strategy_mapping.keys())
+	if args.strategies:
+		# keep dict order but filter to the selected subset
+		base = [s for s in base if s in args.strategies]
+	# keep only those that are actually present in cols
+	return [s for s in base if s in cols]
+
 # -----------------------------
 # Aggregations focused on STRATEGY (not model)
 # -----------------------------
@@ -220,14 +239,14 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	# --- Mann-Whitney U + rank biserial effect size ---
 	rbs_results = {}
 	for s in unique_values:
-		if s == "None":
+		if s == NO_STRATEGY_LABEL:
 			rbs_results[s] = {"p": "-", "rbs": "0"}
 			continue
 
 		df_s = samples_df[samples_df[label_col] == s][[unit_col, value_col]].dropna().rename(
 			columns={value_col: "val_s"}
 		)
-		df_none = samples_df[samples_df[label_col] == "None"][[unit_col, value_col]].dropna().rename(
+		df_none = samples_df[samples_df[label_col] == NO_STRATEGY_LABEL][[unit_col, value_col]].dropna().rename(
 			columns={value_col: "val_none"}
 		)
 		merged = pd.merge(df_s, df_none, on=unit_col, how="inner").sort_values(by=unit_col)
@@ -248,7 +267,7 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 
 	# --- Sort labels by ascending effect size (RBS) ---
 	def rbs_key(s):
-		if s == "None":
+		if s == NO_STRATEGY_LABEL:
 			return 0
 		v = rbs_results.get(s, {}).get("rbs")
 		return v if isinstance(v, (float, int)) and np.isfinite(v) else np.inf
@@ -256,11 +275,11 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	labels = sorted(unique_values, key=rbs_key)
 
 	# --- Plot ---
-	plt.figure(figsize=(10, 4))
+	plt.figure(figsize=(len(labels)*1.1, 4))
 	x = np.arange(len(labels))
 
-	# prepare box colors: highlight "None"
-	box_colors = ["lightgray" if s == "None" else "white" for s in labels]
+	# prepare box colors: highlight NO_STRATEGY_LABEL
+	box_colors = ["lightgray" if s == NO_STRATEGY_LABEL else "white" for s in labels]
 
 	bp = plt.boxplot(
 		[data[s] for s in labels],
@@ -280,23 +299,10 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	plt.ylabel("Sensitivity")
 	plt.title(title)
 
-	# --- Highlight the 'AX' tick (label + tick mark) ---
-	if "AX" in labels:
+	# --- Highlight the PROBE_AXIOMS_INJECTION_LABEL tick (label + tick mark) ---
+	if PROBE_AXIOMS_INJECTION_LABEL in labels:
 		ax = plt.gca()
-		idx_ax = labels.index("AX")
-
-		# color the tick label
-		ax.get_xticklabels()[idx_ax].set_color("tab:red")
-		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
-
-		# color the tick mark lines too (optional)
-		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
-		tick_ax.tick1line.set_color("tab:red")
-		tick_ax.tick2line.set_color("tab:red")
-
-	if "None" in labels:
-		ax = plt.gca()
-		idx_ax = labels.index("None")
+		idx_ax = labels.index(PROBE_AXIOMS_INJECTION_LABEL)
 
 		# color the tick label
 		ax.get_xticklabels()[idx_ax].set_color("tab:green")
@@ -306,6 +312,19 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
 		tick_ax.tick1line.set_color("tab:green")
 		tick_ax.tick2line.set_color("tab:green")
+
+	if NO_STRATEGY_LABEL in labels:
+		ax = plt.gca()
+		idx_ax = labels.index(NO_STRATEGY_LABEL)
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
 
 	# --- Compute axis limits and spacing ---
 	finite_maxes = [np.nanmax(v) for v in data.values() if v.size]
@@ -317,13 +336,15 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	y_offset_median = 0.01 * y_range
 	y_offset_stats = 0.06 * y_range
 	plt.ylim(top=(data_max + 0.10 * y_range), bottom=(data_min - 2 * y_offset_stats))
+	ax = plt.gca()
+	ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f'{y:.0f}%'))
 
 	# --- Mean and median annotations ---
 	for i, s in enumerate(labels):
 		m = means[s]
 		if np.isfinite(m):
 			plt.plot(x[i], m, marker="D", color="black")
-			plt.text(x[i], m + y_offset_mean, f"{m:.2f}", ha="center", va="bottom", fontsize=fontsize,
+			plt.text(x[i], m + y_offset_mean, f"{m:.2f}%", ha="center", va="bottom", fontsize=fontsize,
 				bbox=dict(
 						boxstyle="round,pad=0.2",
 						facecolor="white",
@@ -335,7 +356,7 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 		if vals.size:
 			med = medians[s]
 			plt.plot(x[i], med, marker="o", color="red")
-			plt.text(x[i], med + y_offset_median, f"{med:.2f}", ha="center", va="bottom", fontsize=fontsize,
+			plt.text(x[i], med + y_offset_median, f"{med:.2f}%", ha="center", va="bottom", fontsize=fontsize,
 				bbox=dict(
 						boxstyle="round,pad=0.2",
 						facecolor="white",
@@ -401,19 +422,24 @@ def plot_heatmap(
 	if pivot_df.size == 0:
 		raise ValueError("No data to plot after grouping/pivot. Check 'bias', 'strategy', and value_col.")
 
-	# --- Ensure "None" is the last column ---
-	if "None" in pivot_df.columns:
-		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "None"] + ["None"]]
+	# --- Order columns exactly like strategy_mapping (optionally filtered by --strategies) ---
+	pivot_df = pivot_df.reindex(columns=_ordered_strategy_columns(pivot_df.columns))
+
+	# --- Ensure NO_STRATEGY_LABEL is the last column ---
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		pivot_df = pivot_df[[c for c in pivot_df.columns if c != NO_STRATEGY_LABEL] + [NO_STRATEGY_LABEL]]
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		pivot_df = pivot_df[[PROBE_AXIOMS_INJECTION_LABEL] + [c for c in pivot_df.columns if c != PROBE_AXIOMS_INJECTION_LABEL]]
 
 	# --- Compute p-values (strategy vs None per bias) ---
 	pval_dict = {}
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "None":
+			if strat == NO_STRATEGY_LABEL:
 				pval_dict[(bias, strat)] = (None, 0)
 				continue
 			vals_strat = df[(df["bias"] == bias) & (df["strategy"] == strat)][value_col].dropna()
-			vals_none  = df[(df["bias"] == bias) & (df["strategy"] == "None")][value_col].dropna()
+			vals_none  = df[(df["bias"] == bias) & (df["strategy"] == NO_STRATEGY_LABEL)][value_col].dropna()
 			if len(vals_strat) > 0 and len(vals_none) > 0:
 				try:
 					stat, p = mannwhitneyu(vals_strat, vals_none, alternative="less")
@@ -424,37 +450,58 @@ def plot_heatmap(
 			else:
 				pval_dict[(bias, strat)] = (None, 0)
 
-	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "None") ---
+	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding NO_STRATEGY_LABEL) ---
 	# Build an effect-size DataFrame aligned to pivot_df
 	effect_df = pivot_df.copy().astype(float)
 	effect_df.loc[:, :] = float("nan")
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "None":
+			if strat == NO_STRATEGY_LABEL:
 				continue
 			p, rbs = pval_dict.get((bias, strat), (None, float("nan")))
 			effect_df.loc[bias, strat] = (rbs if p is not None else float("nan"))
 
-	# for rows that have at least one non-NaN effect, override fallback with effect-based best
-	effect_has_values = effect_df.notna().any(axis=1)
-	if effect_has_values.any():
-		# per-row maximum absolute effect
-		row_max = effect_df.max(axis=1, skipna=True)
-		best_mask = effect_df.eq(row_max, axis=0)
-		# never select "None" as best
-		if "None" in best_mask.columns:
-			best_mask["None"] = False
+	# --- BEST mask: primary = min metric; tie-break = max effect size -------------
+	best_mask = pivot_df.notna() & False  # same shape, all False
 
-	# --- Tie-break: if multiple True in a row, keep the one with the lowest metric ---
-	# Uses the numeric values from pivot_df (underlying metric behind ann_df).
 	for bias in pivot_df.index:
-		row_mask = best_mask.loc[bias]
-		if row_mask.sum() > 1:
-			candidates = row_mask[row_mask].index
-			# choose the column with the minimal metric value (ignoring NaNs)
-			chosen = pivot_df.loc[bias, candidates].astype(float).idxmin()
-			best_mask.loc[bias, :] = False
-			best_mask.loc[bias, chosen] = True
+		# candidates: all strategies except NO_STRATEGY_LABEL
+		cols = [c for c in pivot_df.columns if c != NO_STRATEGY_LABEL]
+		# numeric row values for metric
+		metric_vals = pivot_df.loc[bias, cols].astype(float)
+
+		# skip rows that are all NaN
+		if not metric_vals.notna().any():
+			continue
+
+		# 1) primary: pick minimal metric (ignore NaNs)
+		min_val = metric_vals.min(skipna=True)
+		candidates = metric_vals.index[metric_vals == min_val]
+
+		if len(candidates) == 1:
+			chosen = candidates[0]
+		else:
+			# 2) tie-break: pick largest effect size among tied candidates
+			#    (use absolute value; drop abs() if you want signed magnitude)
+			eff = effect_df.loc[bias, candidates].astype(float).abs()
+
+			if eff.notna().any():
+				# among non-NaN effects, take the max
+				# if all effects are NaN, fall back deterministically to first candidate
+				if eff.notna().any():
+					chosen = eff.idxmax()
+				else:
+					chosen = candidates[0]
+			else:
+				chosen = candidates[0]
+
+		# finalize mask
+		best_mask.loc[bias, :] = False
+		best_mask.loc[bias, chosen] = True
+
+	# (Optional) extra guard: ensure NO_STRATEGY_LABEL is never selected
+	if NO_STRATEGY_LABEL in best_mask.columns:
+		best_mask[NO_STRATEGY_LABEL] = False
 
 	# --- Plot ---
 	plt.figure(figsize=(len(pivot_df.columns) * 1.25, max(2.5, len(pivot_df) * 0.5)))
@@ -470,29 +517,44 @@ def plot_heatmap(
 			) if p else ''
 			ann_df.loc[bias, strat] = f"{val:.1f}%{stars}"
 
+	# norm = PowerNorm(gamma=0.4, vmin=0, vmax=np.nanpercentile(pivot_df.values, 99))
+	z = (pivot_df - pivot_df.mean(axis=1).values[:, None]) / pivot_df.std(axis=1).replace(0, np.nan).values[:, None]
 	ax = sns.heatmap(
-		pivot_df,
+		z,
 		annot=ann_df,
 		fmt="",
+		vmin=np.nanpercentile(z.values, 10),
+		vmax=np.nanpercentile(z.values, 90),
 		cmap=cmap,
 		center=center,
-		cbar_kws={"label": value_col.capitalize(), "shrink": 0.9, "pad": 0.01},
+		cbar_kws={"label": 'Row-norm z', "shrink": 0.9, "pad": 0.01},
 		linewidths=0.5,
 		linecolor="gray"
 	)
 	plt.ylabel("")
 	plt.xlabel("")
+	plt.xticks(rotation=25, ha="right")  # or 90 depending on readability
+
+	# # --- Format colorbar ticks as percentages ---
+	# cbar = ax.collections[0].colorbar
+	# cbar.ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100, decimals=0))
 
 	n_rows, n_cols = pivot_df.shape
 
-	# --- Small whitespace gap before "None" instead of a thick line ---
-	if "None" in pivot_df.columns:
-		none_idx = pivot_df.columns.get_loc("None")  # left edge of "None"
+	# --- Small whitespace gap before NO_STRATEGY_LABEL instead of a thick line ---
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc(NO_STRATEGY_LABEL)  # left edge of NO_STRATEGY_LABEL
 		gap = 0.12  # width of the gap in "cell" units; try 0.08–0.2
 		bg = ax.figure.get_facecolor()  # match the figure background
 		# Center a narrow band on the boundary (won't cover text centered in cells)
-		ax.axvspan(none_idx - gap/2, none_idx + gap/2,
-				   color=bg, zorder=6, lw=0)
+		ax.axvspan(none_idx - gap/2, none_idx + gap/2, color=bg, zorder=6, lw=1)
+	# --- Small whitespace gap after PROBE_AXIOMS_INJECTION_LABEL instead of a thick line ---
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL)+1  # right edge of PROBE_AXIOMS_INJECTION_LABEL
+		gap = 0.12  # width of the gap in "cell" units; try 0.08–0.2
+		bg = ax.figure.get_facecolor()  # match the figure background
+		# Center a narrow band on the boundary (won't cover text centered in cells)
+		ax.axvspan(none_idx - gap/2, none_idx + gap/2, color=bg, zorder=6, lw=1)
 
 	ann = {(i, j): ax.texts[i * n_cols + j] for i in range(n_rows) for j in range(n_cols)}
 
@@ -501,14 +563,20 @@ def plot_heatmap(
 		for j, strat in enumerate(pivot_df.columns):
 			significant_pvalue = (pval_dict[(bias, strat)][0] and pval_dict[(bias, strat)][0] < 0.05)
 			if best_mask.iat[i, j]:
-				ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="black", lw=2))
-			if significant_pvalue:
 				t = ann[(i, j)]
 				t.set_fontweight("bold")
-				t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
-				t.set_color("yellow")
+				# t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
+				# t.set_color("yellow")
+			# if best_mask.iat[i, j]:
+			# 	ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="magenta", lw=2))
+			# if significant_pvalue:
+			# 	t = ann[(i, j)]
+			# 	t.set_fontweight("bold")
+			# 	t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
+			# 	t.set_color("yellow")
 			# Add p-value text
-			p_text = fr"$r_{{rb}}={pval_dict[(bias, strat)][-1]:.2f}$" if abs(pval_dict[(bias, strat)][-1]) >= 0.01 else ""
+			p, effect_size = pval_dict[(bias, strat)]
+			p_text = (fr"$r_{{rb}}={effect_size:.2f}$" if abs(effect_size) >= 0.01 else fr"$|r_{{rb}}|<0.01$") if p else ""
 			if p_text not in ["", "-"]:
 				ax.text(
 					j + 0.5, i + 0.67, p_text,
@@ -520,21 +588,9 @@ def plot_heatmap(
 					path_effects=ax.texts[i * n_cols + j].get_path_effects(),
 				)
 
-	# --- Highlight the 'AX' tick (label + tick mark) ---
-	if "AX" in pivot_df.columns:
-		idx_ax = pivot_df.columns.get_loc("AX")
-
-		# color the tick label
-		ax.get_xticklabels()[idx_ax].set_color("tab:red")
-		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
-
-		# color the tick mark lines too (optional)
-		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
-		tick_ax.tick1line.set_color("tab:red")
-		tick_ax.tick2line.set_color("tab:red")
-
-	if "None" in pivot_df.columns:
-		idx_ax = pivot_df.columns.get_loc("None")
+	# --- Highlight the PROBE_AXIOMS_INJECTION_LABEL tick (label + tick mark) ---
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL)
 
 		# color the tick label
 		ax.get_xticklabels()[idx_ax].set_color("tab:green")
@@ -544,6 +600,18 @@ def plot_heatmap(
 		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
 		tick_ax.tick1line.set_color("tab:green")
 		tick_ax.tick2line.set_color("tab:green")
+
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc(NO_STRATEGY_LABEL)
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
 
 	plt.tight_layout()
 	plt.savefig(outpath, dpi=250)
@@ -574,19 +642,24 @@ def plot_heatmap_by_strategy_tier_best(
 	if pivot_df.size == 0:
 		raise ValueError("No data to plot after grouping/pivot.")
 
-	# --- Ensure "None" is the last column ---
-	if "None" in pivot_df.columns:
-		pivot_df = pivot_df[[c for c in pivot_df.columns if c != "None"] + ["None"]]
+	# --- Order columns exactly like strategy_mapping (optionally filtered by --strategies) ---
+	pivot_df = pivot_df.reindex(columns=_ordered_strategy_columns(pivot_df.columns))
+
+	# --- Ensure NO_STRATEGY_LABEL is the last column ---
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		pivot_df = pivot_df[[c for c in pivot_df.columns if c != NO_STRATEGY_LABEL] + [NO_STRATEGY_LABEL]]
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		pivot_df = pivot_df[[PROBE_AXIOMS_INJECTION_LABEL] + [c for c in pivot_df.columns if c != PROBE_AXIOMS_INJECTION_LABEL]]
 
 	# --- Compute p-values (strategy vs None per tier) ---
 	pval_dict = {}
 	for tier in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "None":
+			if strat == NO_STRATEGY_LABEL:
 				pval_dict[(tier, strat)] = (None, 0)
 				continue
 			vals_strat = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == strat)][value_col].dropna()
-			vals_none = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == "None")][value_col].dropna()
+			vals_none = samples_df[(samples_df[tier_col] == tier) & (samples_df[label_col] == NO_STRATEGY_LABEL)][value_col].dropna()
 			if len(vals_strat) > 0 and len(vals_none) > 0:
 				try:
 					stat, p = mannwhitneyu(vals_strat, vals_none, alternative="less")
@@ -597,37 +670,58 @@ def plot_heatmap_by_strategy_tier_best(
 			else:
 				pval_dict[(tier, strat)] = (None, 0)
 
-	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding "None") ---
+	# --- EFFECT-BASED 'best' mask: pick largest |r_rb| per bias (excluding NO_STRATEGY_LABEL) ---
 	# Build an effect-size DataFrame aligned to pivot_df
 	effect_df = pivot_df.copy().astype(float)
 	effect_df.loc[:, :] = float("nan")
 	for bias in pivot_df.index:
 		for strat in pivot_df.columns:
-			if strat == "None":
+			if strat == NO_STRATEGY_LABEL:
 				continue
 			p, rbs = pval_dict.get((bias, strat), (None, float("nan")))
 			effect_df.loc[bias, strat] = (rbs if p is not None else float("nan"))
 
-	# for rows that have at least one non-NaN effect, override fallback with effect-based best
-	effect_has_values = effect_df.notna().any(axis=1)
-	if effect_has_values.any():
-		# per-row maximum absolute effect
-		row_max = effect_df.max(axis=1, skipna=True)
-		best_mask = effect_df.eq(row_max, axis=0)
-		# never select "None" as best
-		if "None" in best_mask.columns:
-			best_mask["None"] = False
+	# --- BEST mask: primary = min metric; tie-break = max effect size -------------
+	best_mask = pivot_df.notna() & False  # same shape, all False
 
-	# --- Tie-break: if multiple True in a row, keep the one with the lowest metric ---
-	# Uses the numeric values from pivot_df (underlying metric behind ann_df).
 	for bias in pivot_df.index:
-		row_mask = best_mask.loc[bias]
-		if row_mask.sum() > 1:
-			candidates = row_mask[row_mask].index
-			# choose the column with the minimal metric value (ignoring NaNs)
-			chosen = pivot_df.loc[bias, candidates].astype(float).idxmin()
-			best_mask.loc[bias, :] = False
-			best_mask.loc[bias, chosen] = True
+		# candidates: all strategies except NO_STRATEGY_LABEL
+		cols = [c for c in pivot_df.columns if c != NO_STRATEGY_LABEL]
+		# numeric row values for metric
+		metric_vals = pivot_df.loc[bias, cols].astype(float)
+
+		# skip rows that are all NaN
+		if not metric_vals.notna().any():
+			continue
+
+		# 1) primary: pick minimal metric (ignore NaNs)
+		min_val = metric_vals.min(skipna=True)
+		candidates = metric_vals.index[metric_vals == min_val]
+
+		if len(candidates) == 1:
+			chosen = candidates[0]
+		else:
+			# 2) tie-break: pick largest effect size among tied candidates
+			#    (use absolute value; drop abs() if you want signed magnitude)
+			eff = effect_df.loc[bias, candidates].astype(float).abs()
+
+			if eff.notna().any():
+				# among non-NaN effects, take the max
+				# if all effects are NaN, fall back deterministically to first candidate
+				if eff.notna().any():
+					chosen = eff.idxmax()
+				else:
+					chosen = candidates[0]
+			else:
+				chosen = candidates[0]
+
+		# finalize mask
+		best_mask.loc[bias, :] = False
+		best_mask.loc[bias, chosen] = True
+
+	# (Optional) extra guard: ensure NO_STRATEGY_LABEL is never selected
+	if NO_STRATEGY_LABEL in best_mask.columns:
+		best_mask[NO_STRATEGY_LABEL] = False
 
 	# --- Plot ---
 	plt.figure(figsize=(len(pivot_df.columns) * 1.15, max(2.5, len(pivot_df) * 0.5)))
@@ -643,29 +737,44 @@ def plot_heatmap_by_strategy_tier_best(
 				 (r"$^{*}$" if p < 0.05 else ""))
 			) if p else ''
 			ann_df.loc[tier, strat] = f"{val:.1f}%{stars}"
+	# norm = PowerNorm(gamma=0.4, vmin=0, vmax=np.nanpercentile(pivot_df.values, 99))
+	z = (pivot_df - pivot_df.mean(axis=1).values[:, None]) / pivot_df.std(axis=1).replace(0, np.nan).values[:, None]
 	ax = sns.heatmap(
-		pivot_df,
+		z,
 		annot=ann_df,
 		fmt="",
+		vmin=np.nanpercentile(z.values, 10),
+		vmax=np.nanpercentile(z.values, 90),
 		cmap=cmap,
 		center=center,
-		cbar_kws={"label": value_col.capitalize(), "shrink": 0.9, "pad": 0.01},
+		cbar_kws={"label": 'Row-norm z', "shrink": 0.9, "pad": 0.01},
 		linewidths=0.5,
 		linecolor="gray"
 	)
 	plt.ylabel("")
 	plt.xlabel("")
+	plt.xticks(rotation=25, ha="right")  # or 90 depending on readability
+
+	# # --- Format colorbar ticks as percentages ---
+	# cbar = ax.collections[0].colorbar
+	# cbar.ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100, decimals=0))
 
 	n_rows, n_cols = pivot_df.shape
 
-	# --- Small whitespace gap before "None" instead of a thick line ---
-	if "None" in pivot_df.columns:
-		none_idx = pivot_df.columns.get_loc("None")  # left edge of "None"
-		gap = 0.12  # width of the gap in "cell" units; try 0.08–0.2
+	# --- Small whitespace gap before NO_STRATEGY_LABEL instead of a thick line ---
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc(NO_STRATEGY_LABEL)  # left edge of NO_STRATEGY_LABEL
+		gap = 0.08  # width of the gap in "cell" units; try 0.08–0.2
 		bg = ax.figure.get_facecolor()  # match the figure background
 		# Center a narrow band on the boundary (won't cover text centered in cells)
-		ax.axvspan(none_idx - gap/2, none_idx + gap/2,
-				   color=bg, zorder=6, lw=0)
+		ax.axvspan(none_idx - gap/2, none_idx + gap/2, color=bg, zorder=6, lw=1)
+	# --- Small whitespace gap after PROBE_AXIOMS_INJECTION_LABEL instead of a thick line ---
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		none_idx = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL)+1  # right edge of PROBE_AXIOMS_INJECTION_LABEL
+		gap = 0.08  # width of the gap in "cell" units; try 0.08–0.2
+		bg = ax.figure.get_facecolor()  # match the figure background
+		# Center a narrow band on the boundary (won't cover text centered in cells)
+		ax.axvspan(none_idx - gap/2, none_idx + gap/2, color=bg, zorder=6, lw=1)
 
 	ann = {(i, j): ax.texts[i * n_cols + j] for i in range(n_rows) for j in range(n_cols)}
 
@@ -674,16 +783,20 @@ def plot_heatmap_by_strategy_tier_best(
 		for j, strat in enumerate(pivot_df.columns):
 			significant_pvalue = (pval_dict[(tier, strat)][0] and pval_dict[(tier, strat)][0] < 0.05)
 			if best_mask.iat[i, j]:
-				# rectangle
-				ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="black", lw=2))
-			if significant_pvalue:
-				# bold white text
 				t = ann[(i, j)]
 				t.set_fontweight("bold")
-				t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
-				t.set_color("yellow")
+				# t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
+				# t.set_color("yellow")
+			# if best_mask.iat[i, j]:
+			# 	ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="magenta", lw=2))
+			# if significant_pvalue:
+			# 	t = ann[(i, j)]
+			# 	t.set_fontweight("bold")
+			# 	t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
+			# 	t.set_color("yellow")
 			# Add p-value text
-			p_text = fr"$r_{{rb}}={pval_dict[(tier, strat)][-1]:.2f}$" if abs(pval_dict[(tier, strat)][-1]) >= 0.01 else ""
+			p, effect_size = pval_dict[(tier, strat)]
+			p_text = (fr"$r_{{rb}}={effect_size:.2f}$" if abs(effect_size) >= 0.01 else fr"$|r_{{rb}}|<0.01$") if p else ""
 			if p_text not in ["", "-"]:
 				ax.text(
 					j + 0.5, i + 0.67, p_text,
@@ -696,21 +809,9 @@ def plot_heatmap_by_strategy_tier_best(
 					# bbox=dict(facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.2")
 				)
 
-	# --- Highlight the 'AX' tick (label + tick mark) ---
-	if "AX" in pivot_df.columns:
-		idx_ax = pivot_df.columns.get_loc("AX")
-
-		# color the tick label
-		ax.get_xticklabels()[idx_ax].set_color("tab:red")
-		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
-
-		# color the tick mark lines too (optional)
-		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
-		tick_ax.tick1line.set_color("tab:red")
-		tick_ax.tick2line.set_color("tab:red")
-
-	if "None" in pivot_df.columns:
-		idx_ax = pivot_df.columns.get_loc("None")
+	# --- Highlight the PROBE_AXIOMS_INJECTION_LABEL tick (label + tick mark) ---
+	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL)
 
 		# color the tick label
 		ax.get_xticklabels()[idx_ax].set_color("tab:green")
@@ -720,6 +821,18 @@ def plot_heatmap_by_strategy_tier_best(
 		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
 		tick_ax.tick1line.set_color("tab:green")
 		tick_ax.tick2line.set_color("tab:green")
+
+	if NO_STRATEGY_LABEL in pivot_df.columns:
+		idx_ax = pivot_df.columns.get_loc(NO_STRATEGY_LABEL)
+
+		# color the tick label
+		ax.get_xticklabels()[idx_ax].set_color("tab:red")
+		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
+
+		# color the tick mark lines too (optional)
+		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
+		tick_ax.tick1line.set_color("tab:red")
+		tick_ax.tick2line.set_color("tab:red")
 
 	plt.tight_layout()
 	plt.savefig(outpath, dpi=250)
@@ -795,7 +908,12 @@ def main():
 	)
 
 	fig_out_heat = outdir / "fig_overall_by_strategy_and_bias_heatmap.pdf"
-	plot_heatmap(samples_overall, fig_out_heat, cmap="icefire", value_col="sensitivity")
+	plot_heatmap(
+		samples_overall, 
+		fig_out_heat, 
+		cmap="viridis_r", 
+		value_col="sensitivity"
+	)
 
 	# Per-tier: distribution across biases within each tier
 	if not long_df.empty:
@@ -821,7 +939,7 @@ def main():
 			tier_col="tier",
 			label_col="strategy",
 			value_col="sensitivity",
-			cmap="coolwarm",
+			cmap="viridis_r",
 			center=None,                # e.g., 0 for diverging metrics
 			fontsize=DEFAULT_FONTSIZE
 		)

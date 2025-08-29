@@ -112,15 +112,15 @@ parser.add_argument(
 	action="store_true",
 )
 parser.add_argument(
-	"--two_step_axioms_elicitation",
+	"--two_steps_self_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
-	"--prolog_driven_two_step_axioms_elicitation",
+	"--prolog_driven_two_steps_self_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
-	"--one_step_axioms_elicitation",
+	"--self_axioms_elicitation",
 	action="store_true",
 )
 #######################################
@@ -211,7 +211,7 @@ _system_instruction = (
 	"Make sure to follow this format strictly without any additional text or formatting."
 )
 
-if args.one_step_axioms_elicitation:
+if args.self_axioms_elicitation:
 	_system_instruction += "The Explanation must first shortly describe what software engineering (SE) best practices are related to the dilemma and how. Then it must use them to justify the decision accordingly."
 
 if args.bias_warning_in_system_instruction:
@@ -359,9 +359,9 @@ for bias_name, dilemma_list in dilemmas_dataset.items():
 		ai_corpus = list(filter(lambda x: x["AI_generated"], dilemma_list))
 		capped_dilemma_list = random.sample(ai_corpus, min_dilemma_list-len(seed_corpus))+seed_corpus # enforce the same number of testing dilemmas across all biases for a fair comparison
 
-	if args.two_step_axioms_elicitation or args.prolog_driven_two_step_axioms_elicitation:
-		_map_fn = get_best_practices_from_output if args.two_step_axioms_elicitation else extract_axioms_description
-		_instruction = _auto_cue_instruction if args.two_step_axioms_elicitation else _prolog_based_auto_cue_instruction
+	if args.two_steps_self_axioms_elicitation or args.prolog_driven_two_steps_self_axioms_elicitation:
+		_map_fn = get_best_practices_from_output if args.two_steps_self_axioms_elicitation else extract_axioms_description
+		_instruction = _auto_cue_instruction if args.two_steps_self_axioms_elicitation else _prolog_based_auto_cue_instruction
 		biased_output_list = instruct_model([
 			dilemma['biased']
 			for dilemma in capped_dilemma_list

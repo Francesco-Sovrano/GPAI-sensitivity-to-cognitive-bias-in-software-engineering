@@ -90,15 +90,15 @@ parser.add_argument(
 	action="store_true",
 )
 parser.add_argument(
-	"--two_step_axioms_elicitation",
+	"--two_steps_self_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
-	"--prolog_two_step_axioms_elicitation",
+	"--prolog_two_steps_self_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
-	"--one_step_axioms_elicitation",
+	"--self_axioms_elicitation",
 	action="store_true",
 )
 #######################################
@@ -161,12 +161,12 @@ def load_all_results(results_dir):
 			base_str += f".impersonified_self_debiasing=True"
 		if args.implication_prompting:
 			base_str += f".implication_prompting=True"
-		if args.two_step_axioms_elicitation:
-			base_str += f".two_step_axioms_elicitation=True"
-		if args.prolog_two_step_axioms_elicitation:
-			base_str += f".prolog_two_step_axioms_elicitation=True"
-		if args.one_step_axioms_elicitation:
-			base_str += f".one_step_axioms_elicitation=True"
+		if args.two_steps_self_axioms_elicitation:
+			base_str += f".two_steps_self_axioms_elicitation=True"
+		if args.prolog_two_steps_self_axioms_elicitation:
+			base_str += f".prolog_two_steps_self_axioms_elicitation=True"
+		if args.self_axioms_elicitation:
+			base_str += f".self_axioms_elicitation=True"
 
 		if args.temperature:
 			pattern = base_str + f".temperature={args.temperature}.top_p={args.top_p}.json"
