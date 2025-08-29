@@ -74,7 +74,7 @@ parser.add_argument(
 	)
 )
 parser.add_argument(
-	"--bias_warning_in_system_instruction",
+	"--bias_warning",
 	action="store_true",
 )
 parser.add_argument(
@@ -90,11 +90,11 @@ parser.add_argument(
 	action="store_true",
 )
 parser.add_argument(
-	"--two_steps_self_axioms_elicitation",
+	"--bistep_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
-	"--prolog_two_steps_self_axioms_elicitation",
+	"--prolog_bistep_axioms_elicitation",
 	action="store_true",
 )
 parser.add_argument(
@@ -153,18 +153,18 @@ def load_all_results(results_dir):
 		if args.inject_axioms:
 			base_str += f".inject_axioms=True"
 
-		if args.bias_warning_in_system_instruction:
-			base_str += f".bias_warning_in_system_instruction=True"
+		if args.bias_warning:
+			base_str += f".bias_warning=True"
 		if args.chain_of_thought:
 			base_str += f".chain_of_thought=True"
 		if args.impersonified_self_debiasing:
 			base_str += f".impersonified_self_debiasing=True"
 		if args.implication_prompting:
 			base_str += f".implication_prompting=True"
-		if args.two_steps_self_axioms_elicitation:
-			base_str += f".two_steps_self_axioms_elicitation=True"
-		if args.prolog_two_steps_self_axioms_elicitation:
-			base_str += f".prolog_two_steps_self_axioms_elicitation=True"
+		if args.bistep_axioms_elicitation:
+			base_str += f".bistep_axioms_elicitation=True"
+		if args.prolog_bistep_axioms_elicitation:
+			base_str += f".prolog_bistep_axioms_elicitation=True"
 		if args.self_axioms_elicitation:
 			base_str += f".self_axioms_elicitation=True"
 
