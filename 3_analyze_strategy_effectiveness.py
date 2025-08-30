@@ -76,14 +76,14 @@ strategy_mapping = {
 	"IMP": ["implication_prompting"], 
 	"IsD": ["impersonified_self_debiasing"], 
 	"BW": ["bias_warning"], 
-	"BW/IsD": ["bias_warning", "impersonified_self_debiasing"], 
+	"BW+IsD": ["bias_warning", "impersonified_self_debiasing"], 
 	## Our prompting strategies
 	"2sAX": ["bistep_axioms_elicitation"], 
-	"2sAX/BW": ["bias_warning", "bistep_axioms_elicitation"], 
+	"2sAX+BW": ["bias_warning", "bistep_axioms_elicitation"], 
 	"sAX": ["self_axioms_elicitation"], 
-	"sAX/BW": ["bias_warning", "self_axioms_elicitation"],
-	"sAX/BW/IsD": ["bias_warning", "impersonified_self_debiasing", "self_axioms_elicitation"],
-	# "sAX/BW/2sAX": ["bias_warning", "bistep_axioms_elicitation", "self_axioms_elicitation"], 
+	"sAX+BW": ["bias_warning", "self_axioms_elicitation"],
+	"sAX+BW+IsD": ["bias_warning", "impersonified_self_debiasing", "self_axioms_elicitation"],
+	# "sAX+BW+2sAX": ["bias_warning", "bistep_axioms_elicitation", "self_axioms_elicitation"], 
 	# "AllGood": ["bias_warning", "impersonified_self_debiasing", "bistep_axioms_elicitation", "self_axioms_elicitation"], 
 }
 
@@ -285,7 +285,7 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	labels = sorted(unique_values, key=rbs_key)
 
 	# --- Plot ---
-	plt.figure(figsize=(len(labels)*1.1, 4))
+	plt.figure(figsize=(len(labels)*1.1, 4), constrained_layout=True)
 	x = np.arange(len(labels))
 
 	# prepare box colors: highlight NO_STRATEGY_LABEL
@@ -309,32 +309,21 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 	plt.ylabel("Sensitivity")
 	plt.title(title)
 
-	# --- Highlight the PROBE_AXIOMS_INJECTION_LABEL tick (label + tick mark) ---
-	if PROBE_AXIOMS_INJECTION_LABEL in labels:
-		ax = plt.gca()
-		idx_ax = labels.index(PROBE_AXIOMS_INJECTION_LABEL)
-
-		# color the tick label
-		ax.get_xticklabels()[idx_ax].set_color("tab:green")
-		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
-
-		# color the tick mark lines too (optional)
-		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
-		tick_ax.tick1line.set_color("tab:green")
-		tick_ax.tick2line.set_color("tab:green")
-
-	if NO_STRATEGY_LABEL in labels:
-		ax = plt.gca()
-		idx_ax = labels.index(NO_STRATEGY_LABEL)
-
-		# color the tick label
-		ax.get_xticklabels()[idx_ax].set_color("tab:red")
-		ax.get_xticklabels()[idx_ax].set_fontweight("bold")
-
-		# color the tick mark lines too (optional)
-		tick_ax = ax.xaxis.get_major_ticks()[idx_ax]
-		tick_ax.tick1line.set_color("tab:red")
-		tick_ax.tick2line.set_color("tab:red")
+	# special tick colors
+	ax = plt.gca()
+	for c in labels:
+		if c in [PROBE_AXIOMS_INJECTION_LABEL,NO_STRATEGY_LABEL]:
+			idx = labels.index(c)
+			ax.get_xticklabels()[idx].set_color("tab:red")
+			ax.get_xticklabels()[idx].set_fontweight("bold")
+			t = ax.xaxis.get_major_ticks()[idx]
+			t.tick1line.set_color("tab:red"); t.tick2line.set_color("tab:red")
+		elif 'AX' in c:
+			idx = labels.index(c)
+			ax.get_xticklabels()[idx].set_color("tab:green")
+			ax.get_xticklabels()[idx].set_fontweight("bold")
+			t = ax.xaxis.get_major_ticks()[idx]
+			t.tick1line.set_color("tab:green"); t.tick2line.set_color("tab:green")
 
 	# --- Compute axis limits and spacing ---
 	finite_maxes = [np.nanmax(v) for v in data.values() if v.size]
@@ -408,7 +397,7 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 		)
 
 	plt.tight_layout()
-	plt.savefig(outpath, dpi=200)
+	plt.savefig(outpath, dpi=200, bbox_inches="tight")
 	if args.show_figures:
 		plt.show()
 	plt.close()
@@ -537,7 +526,7 @@ def plot_heatmap(
 
 	# ---------- color by row-normalized z, label with actual % ----------
 	z = (pivot_df - pivot_df.mean(axis=1).values[:, None]) / pivot_df.std(axis=1).replace(0, np.nan).values[:, None]
-	plt.figure(figsize=(len(pivot_df.columns) * 1.25, max(2.8, len(pivot_df) * 0.55)))
+	plt.figure(figsize=(len(pivot_df.columns) * .9, max(2.8, len(pivot_df) * 0.55)))
 	ax = sns.heatmap(
 		z,
 		annot=ann_df,
@@ -546,13 +535,17 @@ def plot_heatmap(
 		vmax=np.nanpercentile(z.values, 80),
 		cmap=cmap,
 		center=center,
-		cbar_kws={"label": "Row-norm z", "shrink": 0.9, "pad": 0.01},
+		cbar_kws={"label": "Row-norm z", "pad": 0.01, "aspect": 30},
 		linewidths=0.5,
 		linecolor="gray"
 	)
 	ax.set_ylabel("")
 	ax.set_xlabel("")
 	plt.xticks(rotation=25, ha="right")
+
+	# Replace spaces in xtick labels with newlines
+	new_labels = [lbl.get_text().replace(" ", "\n") for lbl in ax.get_yticklabels()]
+	ax.set_yticklabels(new_labels)
 
 	# subtle gaps around Ø and after ProbeAX
 	if baseline_col_value in pivot_df.columns:
@@ -584,34 +577,35 @@ def plot_heatmap(
 			# Add p-value text
 			if samples_df is not None:
 				p, effect_size = pval_dict[(r, c)]
-				p_text = (fr"$r_{{rb}}={effect_size:.2f}$" if abs(effect_size) >= 0.01 else fr"$|r_{{rb}}|<0.01$") if p else ""
+				p_text = (fr"$r_{{rb}}\!=\!{effect_size:.2f}$" if abs(effect_size) >= 0.01 else fr"$|r_{{rb}}|\!<\!0.01$") if p else ""
 				if p_text not in ["", "-"]:
 					ax.text(
 						j + 0.5, i + 0.67, p_text,
 						ha="center", va="top",
 						fontstyle="italic",
 						fontweight=ax.texts[i * n_cols + j].get_fontweight(),
-						fontsize=fontsize-3,
+						fontsize=fontsize-2,
 						color=ax.texts[i * n_cols + j].get_color(),
 						path_effects=ax.texts[i * n_cols + j].get_path_effects(),
 					)
 
 	# special tick colors
-	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
-		idx = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL)
-		ax.get_xticklabels()[idx].set_color("tab:green")
-		ax.get_xticklabels()[idx].set_fontweight("bold")
-		t = ax.xaxis.get_major_ticks()[idx]
-		t.tick1line.set_color("tab:green"); t.tick2line.set_color("tab:green")
-	if baseline_col_value in pivot_df.columns:
-		idx = pivot_df.columns.get_loc(baseline_col_value)
-		ax.get_xticklabels()[idx].set_color("tab:red")
-		ax.get_xticklabels()[idx].set_fontweight("bold")
-		t = ax.xaxis.get_major_ticks()[idx]
-		t.tick1line.set_color("tab:red"); t.tick2line.set_color("tab:red")
+	for c in pivot_df.columns:
+		if c in [PROBE_AXIOMS_INJECTION_LABEL,baseline_col_value]:
+			idx = pivot_df.columns.get_loc(c)
+			ax.get_xticklabels()[idx].set_color("tab:red")
+			ax.get_xticklabels()[idx].set_fontweight("bold")
+			t = ax.xaxis.get_major_ticks()[idx]
+			t.tick1line.set_color("tab:red"); t.tick2line.set_color("tab:red")
+		elif 'AX' in c:
+			idx = pivot_df.columns.get_loc(c)
+			ax.get_xticklabels()[idx].set_color("tab:green")
+			ax.get_xticklabels()[idx].set_fontweight("bold")
+			t = ax.xaxis.get_major_ticks()[idx]
+			t.tick1line.set_color("tab:green"); t.tick2line.set_color("tab:green")
 
 	plt.tight_layout()
-	plt.savefig(outpath_pdf, dpi=250)
+	plt.savefig(outpath_pdf, dpi=250, bbox_inches="tight")
 	if args.show_figures:
 		plt.show()
 	plt.close()
@@ -683,14 +677,20 @@ def main():
 		outpath=fig_out
 	)
 
+	# --- Add "all biases" row ---
+	all_biases_df = df.copy()
+	all_biases_df['bias'] = "all biases"  # same col used for row_col
+
+	# Append back to original df
+	df_with_all = pd.concat([df, all_biases_df], ignore_index=True)
 	fig_out_bias = outdir / "fig_overall_by_strategy_and_bias_heatmap.pdf"
 	plot_heatmap(
-		df=df,
+		df=df_with_all,
 		outpath_pdf=fig_out_bias,
 		row_col="bias",
 		col_col="strategy",
 		value_col="sensitivity",
-		samples_df=df,  # for p-values/effect sizes
+		samples_df=df_with_all,  # for p-values/effect sizes
 		outpath_csv=outdir / "pivot_bias_vs_strategy.csv",
 		fontsize=DEFAULT_FONTSIZE
 	)
