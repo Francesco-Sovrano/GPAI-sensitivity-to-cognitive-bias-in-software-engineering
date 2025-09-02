@@ -12,6 +12,8 @@ from matplotlib import patheffects as pe
 from matplotlib.patches import Rectangle
 from matplotlib.lines import Line2D
 from wordcloud import WordCloud
+import statsmodels.api as sm
+from statsmodels.stats.rates import test_poisson_2indep
 
 
 
@@ -262,27 +264,101 @@ def _bh_fdr(pvals):
 	out[order] = np.clip(adj_sorted, 0, 1)
 	return out
 
-def compute_effects(df, min_tokens=10, method="poisson"):
+def poisson_glm_effect(df_doc, feat_col):
+	y = df_doc[feat_col].astype(int)                 # counts per prompt
+	X = sm.add_constant(df_doc["sensitive_to_bias"].astype(int))
+	off = np.log(df_doc["tokens"].clip(lower=1))
+	m = sm.GLM(y, X, family=sm.families.Poisson(), offset=off)
+	res = m.fit(cov_type="HC1")  # or cov_type="cluster", cov_kwds={"groups": df_doc["prompt_id"]}
+	b = res.params["sensitive_to_bias"]             # log rate ratio
+	se = res.bse["sensitive_to_bias"]
+	lo, hi = b - 1.96*se, b + 1.96*se
+	z = b / se
+	p = 2*sm.stats.normsf(abs(z))
+	return b, se, z, p, lo, hi
+
+def _poisson_glm_effect_per_prompt(df_bias, feat_col, prefer_quasi_if_overdisp=True):
+	"""
+	Returns: effect (log rate ratio), se, z, p, lo, hi, overdisp
+	Effect = coefficient on 'sensitive_to_bias' from a Poisson GLM with log offset(tokens).
+	"""
+	# y: counts per prompt for this feature
+	y = df_bias[feat_col].astype(int).to_numpy()
+
+	# If the feature never appears, bail out early
+	if y.sum() == 0 or df_bias["tokens"].sum() <= 0:
+		return None
+
+	X = pd.DataFrame({
+		"const": 1.0,
+		"sensitive": df_bias["sensitive_to_bias"].astype(int).to_numpy()
+	})
+	offset = np.log(df_bias["tokens"].clip(lower=1).astype(float).to_numpy())
+
+	m = sm.GLM(y, X, family=sm.families.Poisson(), offset=offset)
+
+	# ML fit to gauge overdispersion
+	res_ml = m.fit()
+	df_resid = max(res_ml.df_resid, 1)
+	overdisp = float(res_ml.pearson_chi2 / df_resid)
+
+	# Robust HC1 as sturdy default
+	res_hc = m.fit(cov_type="HC1")
+	b = float(res_hc.params["sensitive"])
+	se = float(res_hc.bse["sensitive"])
+
+	# If strongly overdispersed, use quasi-Poisson SEs (Pearson scaling)
+	if prefer_quasi_if_overdisp and overdisp > 1.5:
+		res_q = m.fit(scale="X2")  # same coef; inflated SEs
+		se = float(res_q.bse["sensitive"])
+
+	z = b / se if se > 0 else np.nan
+	p = 2 * norm.sf(abs(z)) if np.isfinite(z) else np.nan
+	lo, hi = b - 1.96 * se, b + 1.96 * se
+	return b, se, z, p, lo, hi, overdisp
+
+
+def compute_effects(df, min_tokens=10, method="auto"):
+	"""
+	method:
+	  - "poisson" : aggregated Wald log rate ratio (your original)
+	  - "logit"   : aggregated smoothed log-odds diff (your original alternative)
+	  - "glm"     : per-prompt Poisson GLM + offset, robust SEs
+	  - "auto"    : use score/exact for tiny counts; else GLM (robust; quasi if overdispersed)
+	"""
 	feat_cols = [c for c in df.columns if c.startswith("feat_")]
+	rows = []
+
+	# Precompute group totals for rate displays
 	agg = (
 		df.groupby(["bias_name", "sensitive_to_bias"])[feat_cols + ["tokens"]]
 		  .sum()
 		  .reset_index()
 	)
-	rows = []
-	for bias, g in agg.groupby("bias_name"):
-		g1 = g[g["sensitive_to_bias"] == True]
-		g0 = g[g["sensitive_to_bias"] == False]
+
+	for bias, df_bias in df.groupby("bias_name"):
+		# Need both groups present with enough tokens
+		g1 = agg[(agg["bias_name"] == bias) & (agg["sensitive_to_bias"] == True)]
+		g0 = agg[(agg["bias_name"] == bias) & (agg["sensitive_to_bias"] == False)]
 		if g1.empty or g0.empty:
 			continue
 		N1, N0 = int(g1["tokens"].iloc[0]), int(g0["tokens"].iloc[0])
 		if N1 < min_tokens or N0 < min_tokens:
 			continue
+
 		for col in feat_cols:
 			x1, x0 = int(g1[col].iloc[0]), int(g0[col].iloc[0])
 
+			# Skip degenerate all-zero case early
+			if x1 + x0 == 0:
+				continue
+
+			# Rates for display
+			r1k1 = 1000.0 * x1 / max(N1, 1)
+			r1k0 = 1000.0 * x0 / max(N0, 1)
+
 			if method == "poisson":
-				# log rate ratio
+				# Original: Wald LRR with 0.5 add
 				lrr = math.log((x1 + 0.5) / N1) - math.log((x0 + 0.5) / N0)
 				se = math.sqrt(1.0 / (x1 + 0.5) + 1.0 / (x0 + 0.5))
 				z = lrr / se
@@ -290,33 +366,69 @@ def compute_effects(df, min_tokens=10, method="poisson"):
 				lo = lrr - 1.96 * se
 				hi = lrr + 1.96 * se
 				effect = lrr
-			else:
-				# your original smoothed log-odds on token probability
+
+			elif method == "logit":
+				# Original alternative: smoothed logit
 				p1 = max(min((x1 + 1) / (N1 + 2), 1 - 1e-6), 1e-6)
 				p0 = max(min((x0 + 1) / (N0 + 2), 1 - 1e-6), 1e-6)
 				effect = math.log(p1 / (1 - p1)) - math.log(p0 / (1 - p0))
-				# delta-method variance for logit(p) approx 1/(n*p*(1-p))
-				var1 = 1.0 / max((N1 * p1 * (1 - p1)), 1e-9)
-				var0 = 1.0 / max((N0 * p0 * (1 - p0)), 1e-9)
+				var1 = 1.0 / max(N1 * p1 * (1 - p1), 1e-9)
+				var0 = 1.0 / max(N0 * p0 * (1 - p0), 1e-9)
 				se = math.sqrt(var1 + var0)
 				z = effect / se
 				p = 2 * norm.sf(abs(z))
 				lo, hi = effect - 1.96 * se, effect + 1.96 * se
+
+			elif method in ("glm", "auto"):
+				# Tiny-count guardrails (switch to score/exact)
+				small_total = (x1 + x0) < 20
+				if method == "auto" and small_total:
+					# Score test (great all-round), exact for ultra-tiny
+					meth = "exact-cond" if (x1 + x0) <= 5 else "score"
+					try:
+						res_tp = test_poisson_2indep(x1, N1, x0, N0, method=meth)
+						rr = float(res_tp.rate_ratio)
+						lo_rr, hi_rr = res_tp.confint_ratio()
+						effect = math.log(rr)
+						ci_low, ci_high = math.log(lo_rr), math.log(hi_rr)
+						# Wald-ish SE from CI half-width (only for display)
+						se = (ci_high - ci_low) / (2 * 1.96)
+						z = effect / se if se > 0 else np.nan
+						p = float(res_tp.pvalue)
+						lo, hi = ci_low, ci_high
+					except Exception:
+						# Safe fallback: Haldane LRR
+						lrr = math.log((x1 + 0.5) / N1) - math.log((x0 + 0.5) / N0)
+						se = math.sqrt(1.0 / (x1 + 0.5) + 1.0 / (x0 + 0.5))
+						z = lrr / se
+						p = 2 * norm.sf(abs(z))
+						lo, hi = lrr - 1.96 * se, lrr + 1.96 * se
+						effect = lrr
+				else:
+					# Per-prompt GLM with offset
+					out = _poisson_glm_effect_per_prompt(df_bias, col, prefer_quasi_if_overdisp=(method=="auto"))
+					if out is None:
+						continue
+					b, se, z, p, lo, hi, overdisp = out
+					effect = b
+
+			else:
+				raise ValueError(f"Unknown method '{method}'")
 
 			rows.append(dict(
 				bias_name=bias,
 				feature=col.replace("feat_", ""),
 				effect=effect,
 				se=se, z=z, p_value=p, ci_low=lo, ci_high=hi,
-				rate_sensitive_per_1k_tokens=1000 * x1 / N1,
-				rate_not_sensitive_per_1k_tokens=1000 * x0 / N0,
-				count_sensitive=x1, count_not_sensitive=x0, tokens_sensitive=N1, tokens_not_sensitive=N0,
+				rate_sensitive_per_1k_tokens=r1k1,
+				rate_not_sensitive_per_1k_tokens=r1k0,
+				count_sensitive=x1, count_not_sensitive=x0,
+				tokens_sensitive=N1, tokens_not_sensitive=N0,
 			))
 
 	res = pd.DataFrame(rows)
 	if not res.empty:
-		# FDR per feature across all biases (global)
-		res["p_fdr"] = _bh_fdr(res["p_value"].values)
+		res["p_fdr"] = _bh_fdr(res["p_value"].fillna(1.0).to_numpy())
 		res["significant"] = res["p_fdr"] < 0.05
 		res["direction"] = np.where(res["effect"] > 0, "sensitive>not", "not>sensitive")
 		res = res.sort_values(["bias_name", "p_fdr", "effect"], ascending=[True, True, False])
@@ -332,18 +444,18 @@ def plot_overview_heatmap(
 	# --- NEW ---
 	rowwise_top_k=3,                          # how many to highlight per row
 	rowwise_metric="effect",              # "abs_effect" | "effect" | "display"
-	rowwise_require_significant=False,        # restrict to significant cells?
+	rowwise_require_significant=True,        # restrict to significant cells?
 	rowwise_box_kw=None                       # dict for Rectangle styling
 ):
 
 	def _wrap_labels(labels, width=32):
-		return [textwrap.fill(str(lbl).replace("_", " "), width=width) for lbl in labels]
+		return [textwrap.fill(str(lbl).replace("_", " ").replace(" ", "\n"), width=width) for lbl in labels]
 
 	def _auto_fontsizes(nrows, ncols):
 		xfs = 10 if ncols <= 22 else 9 if ncols <= 34 else 8 if ncols <= 48 else 7
 		yfs = 11 if nrows <= 20 else 10 if nrows <= 35 else 9 if nrows <= 55 else 8
 		tfs = 13 if max(nrows, ncols) <= 30 else 12
-		return xfs, yfs, tfs
+		return xfs, yfs-1, tfs
 
 	d = res.copy()
 	if d.empty:
@@ -389,14 +501,15 @@ def plot_overview_heatmap(
 	if data.size == 0:
 		return
 
-	# Symmetric scaling
-	vmax = float(np.nanpercentile(np.abs(data), 97)) or 1.0
-	norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+	# Asymmetric scaling
+	vmax = np.nanpercentile(data, 99)
+	vmin = np.nanpercentile(data, 5)
+	norm = TwoSlopeNorm(vmin=vmin, vcenter=0.0, vmax=vmax)
 
 	# Sizing
 	nrows, ncols = data.shape
-	fig_w = min(24, 2.0 + 0.45 * ncols)
-	fig_h = min(18, 1.2 + 0.5 * max(4, nrows))
+	fig_w = 2.0 + 0.325 * ncols
+	fig_h = 1.2 + 0.4 * max(4, nrows)
 	fig, ax = plt.subplots(figsize=(fig_w, fig_h))
 
 	im = ax.imshow(data, aspect="auto", norm=norm, cmap="RdBu_r")
@@ -411,11 +524,11 @@ def plot_overview_heatmap(
 	# Ticks & de-cluttered x-labels
 	xfs, yfs, tfs = _auto_fontsizes(nrows, ncols)
 	ax.set_yticks(np.arange(nrows))
-	ax.set_yticklabels(_wrap_labels(piv.index, width=24), fontsize=yfs)
+	ax.set_yticklabels(_wrap_labels(piv.index, width=11), fontsize=yfs)
 
 	ax.set_xticks(np.arange(ncols))
 	show = set(np.linspace(0, ncols - 1, num=min(ncols, max_xticklabels), dtype=int).tolist())
-	xlabels_full = _wrap_labels(piv.columns, width=18)
+	xlabels_full = _wrap_labels(piv.columns, width=13)
 	xlabels = [lbl if j in show else "" for j, lbl in enumerate(xlabels_full)]
 	ax.set_xticklabels(xlabels, rotation=90, ha="center", fontsize=xfs)
 
@@ -428,14 +541,17 @@ def plot_overview_heatmap(
 	# Visual separator for tail group
 	if len(tail_present) > 0 and len(head) > 0:
 		split_at = len(head) - 0.5
-		ax.axvline(split_at, color="k", lw=1.0, alpha=0.25)
+		ax.axvline(split_at, color="k", lw=2.0, alpha=0.25)
 		ax.axvspan(split_at, ncols - 0.5, color="k", alpha=0.04)
 
 	# Title + colorbar
-	ax.set_title("SE feature impact on bias sensitivity (log rate ratio)", fontsize=tfs)
-	cb = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02)
-	cb.set_ticks([-vmax, -0.5*vmax, 0.0, 0.5*vmax, vmax])
-	cb.set_label("Effect (log rate ratio)")
+	# ax.set_title("SE feature impact on bias sensitivity (log rate ratio)", fontsize=tfs)
+	cb = fig.colorbar(im, ax=ax, fraction=0.02, pad=0.005, format="%.1f")
+	cb.set_ticks([vmin, vmin/2, 0.0, vmax/2, vmax])
+	for label in cb.ax.get_yticklabels():
+		label.set_rotation(90)
+		label.set_horizontalalignment("center")
+	cb.set_label("Effect (log rate ratio)", fontsize=8)
 
 	# ----- Row-wise top-k highlighting -----
 	if rowwise_box_kw is None:
@@ -520,7 +636,7 @@ def plot_overview_heatmap(
 		ax.legend(
 			handles=legend_handles,
 			loc="upper left",
-			bbox_to_anchor=(.9, 1.1),
+			bbox_to_anchor=(.88, 1.1),
 			borderaxespad=0,
 			frameon=True,
 			fontsize=max(8, xfs-1)
@@ -637,50 +753,59 @@ def cluster_order_from_matrix(X, axis="columns"):
 	S = 0.5 * (C + 1.0)
 	return _spectral_order_from_similarity(S)
 
-def compute_word_effects(df, min_tokens=10, method="poisson", top_n=50):
+def compute_word_effects(df, min_tokens=10, method="auto", top_n=50):
 	"""
-	Compute effect sizes for individual words (not cluster features).
-	Returns per-bias dataframe with word-level log-rate ratios.
+	Word-level log rate ratios using the same inference upgrades.
+	Returns columns: bias_name, word, effect, count_sensitive, count_not_sensitive, p_value, ci_low, ci_high
 	"""
 	rows = []
 	for bias, g in df.groupby("bias_name"):
-		g1 = g[g["sensitive_to_bias"] == True]["prompt_with_bias"].str.lower().str.findall(r"\b\w+\b")
-		g0 = g[g["sensitive_to_bias"] == False]["prompt_with_bias"].str.lower().str.findall(r"\b\w+\b")
+		txt1 = g[g["sensitive_to_bias"] == True]["prompt_with_bias"].astype(str).str.lower()
+		txt0 = g[g["sensitive_to_bias"] == False]["prompt_with_bias"].astype(str).str.lower()
 
-		words1 = pd.Series([w for lst in g1 for w in lst])
-		words0 = pd.Series([w for lst in g0 for w in lst])
+		w1 = pd.Series([w for lst in txt1.str.findall(r"\b\w+\b") for w in lst])
+		w0 = pd.Series([w for lst in txt0.str.findall(r"\b\w+\b") for w in lst])
 
-		# get counts
-		N1, N0 = words1.size, words0.size
+		N1, N0 = int(w1.size), int(w0.size)
 		if N1 < min_tokens or N0 < min_tokens:
 			continue
 
-		for w in set(words1.unique()) | set(words0.unique()):
-			x1 = (words1 == w).sum()
-			x0 = (words0 == w).sum()
+		counts1 = w1.value_counts()
+		counts0 = w0.value_counts()
+		all_words = set(counts1.index) | set(counts0.index)
 
-			# skip rare words
+		for w in all_words:
+			x1 = int(counts1.get(w, 0))
+			x0 = int(counts0.get(w, 0))
 			if x1 + x0 < 3:
 				continue
 
-			if method == "poisson":
-				lrr = math.log((x1 + 0.5) / N1) - math.log((x0 + 0.5) / N0)
-				se = math.sqrt(1.0 / (x1 + 0.5) + 1.0 / (x0 + 0.5))
-				z = lrr / se
-				p = 2 * norm.sf(abs(z))
-				effect = lrr
-			else:
-				# fallback logit odds
-				p1 = max(min((x1 + 1) / (N1 + 2), 1 - 1e-6), 1e-6)
-				p0 = max(min((x0 + 1) / (N0 + 2), 1 - 1e-6), 1e-6)
-				effect = math.log(p1/(1-p1)) - math.log(p0/(1-p0))
-				se = 1.0
-				p = 0.5  # rough, not exact
+			try:
+				meth = "exact-cond" if (x1 + x0) <= 5 else "score"
+				res_tp = test_poisson_2indep(x1, N1, x0, N0, method=meth)
+				rr = float(res_tp.rate_ratio)
+				lo_rr, hi_rr = res_tp.confint_ratio()
+				if rr <= 0 or not np.isfinite(rr):
+					raise ValueError("bad rr")
+				effect = math.log(rr)
+				ci_low, ci_high = math.log(lo_rr), math.log(hi_rr)
+				p = float(res_tp.pvalue)
+			except Exception:
+				# fallback to Haldane-smoothed LRR
+				effect = math.log((x1 + 0.5) / N1) - math.log((x0 + 0.5) / N0)
+				# no reliable p/CI under fallback
+				p = np.nan
+				ci_low = np.nan
+				ci_high = np.nan
 
-			rows.append(dict(bias_name=bias, word=w, effect=effect, count_sensitive=x1, count_not_sensitive=x0))
+			rows.append(dict(
+				bias_name=bias, word=w, effect=effect,
+				count_sensitive=x1, count_not_sensitive=x0,
+				p_value=p, ci_low=ci_low, ci_high=ci_high
+			))
 
-	res = pd.DataFrame(rows)
-	return res
+	return pd.DataFrame(rows)
+
 
 
 def plot_wordclouds_tokens(res_words, out_dir, top_n=50):
@@ -699,7 +824,7 @@ def plot_wordclouds_tokens(res_words, out_dir, top_n=50):
 			colormap="RdBu_r",
 		).generate_from_frequencies(freqs)
 
-		out = out_dir / f"wordcloud_words_{bias.replace(' ', '_')}.png"
+		out = out_dir / f"wordcloud_words_{bias.replace(' ', '_')}.pdf"
 		wc.to_file(out)
 		print(f"Saved token-level wordcloud: {out}")
 
@@ -709,8 +834,11 @@ if __name__ == "__main__":
 	p = argparse.ArgumentParser()
 	p.add_argument("--zip", type=Path, required=True, help="Path to to_analyze.zip")
 	# p.add_argument("--max-per-group", type=int, default=None)
-	p.add_argument("--method", choices=["poisson","logit"], default="poisson",
-				   help="Effect metric; 'poisson' = log rate ratio (recommended)")
+	p.add_argument("--method", 
+		choices=["auto","poisson","glm","logit"], 
+		default="auto",
+		help="Effect metric: 'auto' = tiny-count exact/score + per-prompt Poisson GLM (robust/quasi); 'poisson' = aggregated Wald LRR; 'glm' = GLM+offset; 'logit' = smoothed log-odds"
+	)
 	p.add_argument("--top-n", type=int, default=12)
 	args = p.parse_args()
 
@@ -748,9 +876,9 @@ if __name__ == "__main__":
 	top.to_csv(out_dir / "top_significant_by_bias.csv", index=False)
 
 	if not res.empty:
-		plot_overview_heatmap(res, out_dir / "overview_heatmap.png")
+		plot_overview_heatmap(res, out_dir / "overview_heatmap.pdf")
 		for bias in sorted(res["bias_name"].unique()):
-			plot_dotmap(res, bias, out_dir / f"dotmap_{bias.replace(' ', '_')}.png", top_n=args.top_n)
+			plot_dotmap(res, bias, out_dir / f"dotmap_{bias.replace(' ', '_')}.pdf", top_n=args.top_n)
 
 	print(f"Saved: {csv_path}")
-	print("Also wrote: overview_heatmap.png and dotmap_<bias>.png (one per bias)")
+	print("Also wrote: overview_heatmap.pdf and dotmap_<bias>.pdf (one per bias)")
