@@ -1,135 +1,213 @@
-# Evaluating and Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering
+# Replication Package — Mitigating Prompt‑Induced Cognitive Biases in GPAI for Software Engineering
 
-Welcome to the replication package for the ICSE 2025 paper titled "Evaluating and Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering".
+This repository is the **replication package** for the paper *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering*. It contains the datasets, experiment scripts, and plotting utilities needed to reproduce the results reported in the paper.
 
-## Abstract
+> **Dataset provenance.** The dilemmas and axiomatic backgrounds used here come from the **PROBE‑SWE** benchmark (dynamic SE dilemmas with biased/unbiased paired prompts). A dump is included under `./dataset/`.
 
-Cognitive biases are mental shortcuts that reduce effort but can distort judgment. In software engineering, biases like confirmation bias can cause developers to test their programs only with data that aligns with how they expect the program to work, rather than using data that might reveal inconsistencies or errors. Meanwhile, general-purpose AI (GPAI) is rapidly gaining traction in software engineering tasks, from code completion to architectural design, increasingly performing tasks traditionally done by developers and raising concerns that these AI systems may inherit or even amplify the biases present in their human-generated training data. This paper investigates prompt-induced biases in GPAI systems for software engineering tasks (e.g., GPT-4o, DeepSeek, LLama3.3) to determine if they are affected by the same cognitive biases observed in human decision-making. We focus on common harmful biases (e.g., availability bias, hyperbolic discounting, confirmation bias) by designing paired task instances, one negatively biased (nudging the GPAI toward a less agreeable answer) and one not. Our within-model evaluation shows that all tested GPAI systems are significantly sensitive (𝑝 < 0.05; 1-𝛽 ≥ 0.8) to at least five biases. Although cognitive biases may expedite human reasoning, their presence in GPAI systems can lead to suboptimal decisions, potentially resulting in flawed designs and inefficient resource allocation. Therefore, we explore mitigation strategies such as bias-aware chain-of-thought and we create a novel approach to counter bias, based on human-centred explainable AI techniques to create task-specific reasoning cues. Our results indicate that our approach reduces cognitive bias effects in nearly all advanced GPAI systems, except for the bandwagon effect. These findings shed light on how cognitive biases affect AI decision-making in software engineering and offer actionable recommendations to both practitioners and researchers for developing more robust, bias-resistant, and trustworthy AI systems.
+---
 
-## Overview
-This repository contains resources and scripts for analyzing and visualizing the sensitivity of General-Purpose AI (GPAI) models to various cognitive biases within software engineering contexts. Specifically, it investigates how prompting strategies and bias scenarios affect GPAI decision-making.
+## Contents
 
-## Repository Structure
-- `gpai_study/`: Contains scripts for conducting experiments and analyzing data.
-  - Scripts include:
-    - Data collection and preprocessing (`0_get_stats_about_scenarios.py`, `1_get_decisions.py`, `1_get_decisions_by_persona.py`).
-    - Analysis scripts (`2_visualize_results.py`, `3_chi_squared_analysis.py`, `4_global_sensitivity_analysis.py`).
-    - `lib.py`: Shared utilities.
-    - `run_all_experiments.sh`: Automated execution of all experiments.
-    - `requirements.txt`: Python dependencies required for execution.
-- `scenarios/`: Text-based scenario descriptions categorized by cognitive biases with unbiased and biased versions.
-  - Types of cognitive biases covered:
-    - Confirmation Bias
-    - Hyperbolic Discounting
-    - Availability Bias
-    - Anchoring Bias
-    - Overconfidence Bias
-    - Bandwagon Effect
-    - Framing Effect
-    - Hindsight Bias
+- `1_compute_bias_sensitivity.py` — run the core experiments for a given model and prompting strategy.
+- `2_visualize_bias_sensitivity.py` — generate per‑bias plots, complexity‑tier breakdowns, and summary PDFs.
+- `3_analyze_strategy_effectiveness.py` — aggregate and visualize per‑strategy effectiveness (heatmaps/boxplots).
+- `lib.py` — shared utilities, the LLM client wrapper (OpenAI/Groq compatible), caching, and helpers.
+- `dataset/` — augmented dilemmas for several base models (JSON).
+- `generated_output_data/` — where result JSONs and figures are written.
+- `logs/` — optional run logs when you pipe `stdout/stderr` there.
+- `requirements.txt` — Python dependencies.
+- `run_all_experiments.sh` — example batch runner (you may tailor it to your keys/models/settings).
+- `LICENSE` — MIT.
 
-## Scenario Types
-- `_1st_person_cued_`: First-person scenarios with explicit cues designed to evoke cognitive biases.
-- `_1st_person_shallow_`: First-person scenarios without explicit bias cues (baseline scenarios).
+---
 
-## Environment Setup
+## Prerequisites
 
-Ensure Python dependencies are installed:
+- Python **3.10+**
+- An API key for at least one provider
+  - **OpenAI** (e.g., `gpt-4o-mini`, `gpt-4.1-mini`, `gpt-4.1-nano`)
+  - **Groq** (e.g., `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `deepseek-r1-distill-llama-70b`)
+
+Install dependencies in a fresh virtual environment:
+
 ```bash
+python3 -m venv .env
+source .env/bin/activate             # Windows: .env\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### System Specifications
+---
 
-This repository is tested and recommended on:
+## Configure API Keys
 
-- OS: Linux (Debian 5.10.179 or newer) and macOS (15.3.1 Sequoia or newer)
-- Python version: 3.9 or newer
+The scripts automatically pick the correct base URL from the chosen model name and will look for API keys in the environment:
 
-### Installation of OpenAI Keys
+- **OpenAI models** → read `OPENAI_API_KEY` and call `https://api.openai.com/v1`
+- **Groq models** → read `GROQ_API_KEY` and call `https://api.groq.com/openai/v1`
 
-To run the experiments with OpenAI's GPT models, you must set up two environment variables: `OPENAI_ORGANIZATION` and `OPENAI_API_KEY`. These variables represent your OpenAI organization identifier and your API key respectively.
+### Option A — Export in your shell (recommended)
 
-On UNIX-like Operating Systems (Linux, MacOS):
-1. Open your terminal.
-2. To set the `OPENAI_ORGANIZATION` variable, run:
-   ```bash
-   export OPENAI_ORGANIZATION='your_organization_id'
-   ```
-3. To set the `OPENAI_API_KEY` variable, run:
-   ```bash
-   export OPENAI_API_KEY='your_api_key'
-   ```
-4. These commands will set the environment variables for your current session. If you want to make them permanent, you can add the above lines to your shell profile (`~/.bashrc`, `~/.bash_profile`, `~/.zshrc`, etc.)
+**macOS/Linux**
 
-To ensure you've set up the environment variables correctly:
-
-1. In your terminal or command prompt, run:
-   ```bash
-   echo $OPENAI_ORGANIZATION
-   ```
-   This should display your organization ID.
-   
-2. Similarly, verify the API key:
-   ```bash
-   echo $OPENAI_API_KEY
-   ```
-
-Ensure that both values match what you've set.
-
-### Installation of Groq API Keys
-
-To run the experiments with DeepSeek and LLama 3.3, you must also set up one environment variable: `GROQ_API_KEY`. This variable represents your [Groq](https://groq.com) API key.
-
-On UNIX-like Operating Systems (Linux, macOS):
-
-1. Open your terminal.
-2. To set the `GROQ_API_KEY` variable, run:
-   ```bash
-   export GROQ_API_KEY='your_api_key'
-   ```
-3. This command will set the environment variable for your current session. If you want to make it permanent, you can add the above line to your shell profile (e.g., `~/.bashrc`, `~/.bash_profile`, `~/.zshrc`, etc.).
-
-To ensure you've set up the environment variables correctly:
-
-1. In your terminal or command prompt, run:
-   ```bash
-   echo $GROQ_API_KEY
-   ```
-
-Make sure that the value matches what you've set.
-
-## Running the Experiments
-
-To run all experiments, execute:
 ```bash
-sh run_all_experiments.sh
+export OPENAI_API_KEY="sk-..."
+export GROQ_API_KEY="gsk_..."
 ```
 
-## Results and Analysis
+**Windows (PowerShell)**
 
-Generated results and sensitivity analyses are stored in `gpai_study/results/`, including summary tables (`.csv`) and visualizations (`.pdf`). Here you will find:
+```powershell
+setx OPENAI_API_KEY "sk-..."
+setx GROQ_API_KEY "gsk_..."
+# Restart your shell so the variables are available
+```
 
-- **Summary Metrics:**
-  - **Text Files:**  
-    - `averages_1st_person_cued_.txt`  
-    - `averages_1st_person_shallow_.txt`  
-    These files provide aggregated metrics (such as average sensitivity scores) across different bias scenarios for each experimental condition.
-  
-- **Detailed Decision Logs:**
-  - **CSV Files in the `_1st_person_cued_` folder:**
-    - `sensitivity_scores_cued.csv`: Contains computed sensitivity scores for first-person cued scenarios.
-    - `decisions_model-gpt-4o-2024-08-06_temperature-1_top_p-1.csv`: Detailed decision outputs for the GPT-4 model using specific experimental parameters.
-    - `decisions_model-gpt-4o-mini-2024-07-18_temperature-1_top_p-1.csv`: Similar decision logs for a GPT-4 mini configuration.
+You can also prefix a single command:
 
-- **Visualizations:**
-  - Within several subdirectories (e.g., `_1st_person_shallow_CoT_`, `_1st_person_shallow_warning_`, and `_1st_person_cued_`), you will find a **figures** folder containing visual outputs:
-    - **PDF Files:** Visualizations such as stacked bar charts (e.g., `sensitivity_stacked_correct_incorrect.pdf`) that compare biased versus unbiased task performance across scenarios.
+```bash
+OPENAI_API_KEY="sk-..." python 1_compute_bias_sensitivity.py --model gpt-4o-mini
+```
 
-These results help evaluate:
-- **Performance Differences:** How AI decisions vary when presented with biased versus unbiased scenarios.
-- **Sensitivity Scores:** Quantitative assessments of the AI model’s sensitivity to various cognitive biases.
-- **Comparative Analyses:** Insights into how different prompting strategies affect decision-making.
+### Option B — Source a local file
 
-## Contributing
-Contributions to enhance scenarios, analysis methods, or general improvements are welcome. Please submit pull requests or open issues for discussions.
+Create a file (e.g., `keys.env`) that contains:
+
+```bash
+export OPENAI_API_KEY="sk-..."
+export GROQ_API_KEY="gsk_..."
+```
+
+Then source it before running:
+
+```bash
+source keys.env
+```
+
+> **Security note:** never commit your API keys. The sample shell script is provided for convenience—edit it locally and keep your keys private.
+
+---
+
+## Quick Start
+
+Run the baseline experiment for a single model (5 independent runs per dilemma):
+
+```bash
+python 1_compute_bias_sensitivity.py   --model gpt-4o-mini   --n_independent_runs_per_task 5
+```
+
+Results are written to `generated_output_data/` as JSON files whose names encode all relevant flags.
+
+### Choosing a provider/model
+
+- **OpenAI examples**
+  - `--model gpt-4o-mini`
+  - `--model gpt-4.1-mini`
+  - `--model gpt-4.1-nano`
+- **Groq examples**
+  - `--model llama-3.3-70b-versatile`
+  - `--model llama-3.1-8b-instant`
+  - `--model deepseek-r1-distill-llama-70b`
+
+> The script routes OpenAI‑prefixed models to `OPENAI_API_KEY` and Groq‑hosted models to `GROQ_API_KEY` automatically.
+
+### Evaluate prompting strategies (flags)
+
+The main script exposes flags that mirror the strategies discussed in the paper:
+
+| Strategy (paper) | What it does | Flag(s) |
+|---|---|---|
+| **Baseline (∅)** | No mitigation | *(no extra flags)* |
+| **Chain‑of‑Thought (CoT)** | Ask the model to reason step‑by‑step | `--chain_of_thought` |
+| **Implication Prompting (IMP)** | Ask for implications and why a decision might be biased | `--implication_prompting` |
+| **Self‑Debiasing (BW)** | Add a bias‑warning instruction | `--bias_warning` |
+| **Self‑Debiasing (IsD)** | Impersonated “unbiased engineer” instruction | `--impersonified_self_debiasing` |
+| **sAX** | *Self axiomatic background elicitation* (extract + apply SE best‑practice cues in the explanation) | `--self_axioms_elicitation` |
+| **2sAX** | *Two‑step axiomatic background elicitation* (extract cues first, then use them) | `--bistep_axioms_elicitation` |
+| **ProbeAX** | Append option‑agnostic axiomatic backgrounds from PROBE-SWE as reasoning cues | `--inject_axioms` |
+
+**Examples**
+
+The examples below are ran on gpt-4o-mini (flag `--model`) on the whole dataset (flag `--data_model_list`).
+
+∅ (no-strategy baseline):
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b  
+```
+
+sAX + BW (recommended in the paper):
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --self_axioms_elicitation --bias_warning --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b  
+```
+
+sAX + BW + IsD (recommended in the paper):
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --self_axioms_elicitation --bias_warning --impersonified_self_debiasing --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b  
+```
+
+2sAX:
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --bistep_axioms_elicitation --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b
+```
+
+Self‑debiasing (BW + IsD):
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --bias_warning --impersonified_self_debiasing --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b
+```
+
+Chain‑of‑thought:
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --chain_of_thought --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b
+```
+
+Implication prompting:
+```bash
+python 1_compute_bias_sensitivity.py --model gpt-4o-mini --implication_prompting --n_independent_runs_per_task 5 --data_model_list gpt-4.1-mini gpt-4o-mini deepseek-r1-distill-llama-70b
+```
+
+---
+
+## Visualize and Summarize Results
+
+After running experiments on all models, create the figures and summary PDFs (written to `generated_output_data/` by `2_visualize_bias_sensitivity.py` and to `strategy_effectiveness_analyses/` by `3_analyze_strategy_effectiveness`) using the scripts `2_visualize_bias_sensitivity.py` and `3_analyze_strategy_effectiveness`.
+
+**Examples**
+
+∅ (no-strategy baseline):
+```bash
+python 2_visualize_bias_sensitivity.py
+```
+
+sAX + BW (recommended in the paper):
+```bash
+python 2_visualize_bias_sensitivity.py --self_axioms_elicitation --bias_warning 
+```
+
+All strategies:
+```bash
+python 3_analyze_strategy_effectiveness --show_figures
+```
+
+---
+
+## Reproducing the Paper (Workflow Recap)
+
+1. **Set up** a clean virtualenv and install deps.
+2. **Export API keys** for the providers you intend to use.
+3. **Run experiments** with the desired strategies (baseline, sAX, 2sAX, CoT, self‑debiasing, IMP).
+4. **Generate plots** with `2_visualize_bias_sensitivity.py` and **aggregate strategy results** with `3_analyze_strategy_effectiveness.py`.
+5. Inspect PDFs in `generated_output_data/` and `strategy_effectiveness_analyses/`.
+
+API usage incurs cost; consider lowering `--n_independent_runs_per_task` or running on fewer models when testing your setup.
+
+---
+
+## License
+
+This project is released under the **MIT License** (see `LICENSE`).
+
+---
+
+## Troubleshooting
+
+- *401/permission errors*: verify the correct key is exported for the selected model/provider.
+- *Rate limits*: reduce parallelism (defaults are conservative) or try again later.
