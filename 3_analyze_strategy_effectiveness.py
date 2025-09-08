@@ -698,12 +698,12 @@ def main():
 	# 3) Model × Strategy (the new “strategy vs model” view)
 	fig_out_sxm = outdir / "fig_strategy_vs_model_heatmap.pdf"
 	plot_heatmap(
-		df=df,
+		df=df_with_all,
 		outpath_pdf=fig_out_sxm,
 		row_col="model",
 		col_col="strategy",
 		value_col="sensitivity",
-		samples_df=df,
+		samples_df=df_with_all,
 		outpath_csv=outdir / "pivot_model_vs_strategy.csv",
 		fontsize=DEFAULT_FONTSIZE
 	)
