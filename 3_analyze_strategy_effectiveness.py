@@ -786,7 +786,7 @@ def plot_heatmap(
 
 	def _bold_special_xticks(ax, cols):
 		# Accessibility: use typography (bold) rather than color for special columns.
-		for special in [PROBE_AXIOMS_INJECTION_LABEL, baseline_col_value]:
+		for special in [baseline_col_value]:
 			if special in cols:
 				idx = cols.index(special)
 				ax.get_xticklabels()[idx].set_fontweight("bold")
