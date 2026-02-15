@@ -24,6 +24,8 @@ mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype']  = 42
 
 DEFAULT_FONTSIZE = 9
+DEFAULT_ALTERNATIVE = "two-sided" 
+# DEFAULT_ALTERNATIVE = "less"
 
 # -----------------------------
 # Argument Parsing
@@ -227,8 +229,50 @@ def aggregate_strategy_by_tier(long_df):
 def compute_rbs(_x, _y, stat):
 	return 1 - (2 * stat / (len(_x) * len(_y)))
 
-def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col, value_col, title, outpath, fontsize=DEFAULT_FONTSIZE):
+def benjamini_hochberg(pvals):
+	"""
+	Benjamini–Hochberg FDR correction.
 
+	Parameters
+	----------
+	pvals : array-like
+		Sequence of p-values.
+
+	Returns
+	-------
+	np.ndarray
+		FDR-adjusted p-values (q-values), same shape/order as input.
+	"""
+	pvals = np.asarray(pvals, dtype=float)
+	m = pvals.size
+	if m == 0:
+		return pvals
+
+	order = np.argsort(pvals)
+	ranked = pvals[order]
+
+	adjusted = np.empty(m, dtype=float)
+	prev = 1.0
+	for i in range(m - 1, -1, -1):
+		p = ranked[i]
+		q = p * m / (i + 1.0)
+		if q > prev:
+			q = prev
+		prev = q
+		adjusted[i] = q
+
+	adjusted = np.minimum(adjusted, 1.0)
+	out = np.empty(m, dtype=float)
+	out[order] = adjusted
+	return out
+
+def plot_box_by_strategy(
+	aggregated_samples_df, samples_df,
+	label_col, unit_col, value_col,
+	title, outpath,
+	fontsize=DEFAULT_FONTSIZE,
+	outpath_stats_csv=None,   # <-- NEW
+):
 	# --- Collect basic per-label stats into dicts ---
 	unique_values = aggregated_samples_df[label_col].dropna().unique().tolist()
 
@@ -246,34 +290,77 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 		means[s] = np.nanmean(vals)
 		medians[s] = np.nanmedian(vals)
 
-	# --- Mann-Whitney U + rank biserial effect size ---
+	# --- Mann-Whitney U + rank biserial effect size (strategy vs Ø) ---
 	rbs_results = {}
+	n_results = {}
+
+	# IMPORTANT FIX: collapse raw samples to 1 value per (unit_col, strategy) before testing
+	_collapsed = (
+		samples_df[[unit_col, label_col, value_col]]
+		.dropna()
+		.groupby([unit_col, label_col], as_index=False)[value_col]
+		.mean()
+	)
+
 	for s in unique_values:
 		if s == NO_STRATEGY_LABEL:
-			rbs_results[s] = {"p": "-", "rbs": "0"}
+			rbs_results[s] = {"p": np.nan, "rbs": 0.0}
+			n_results[s] = {"n_units": np.nan}
 			continue
 
-		df_s = samples_df[samples_df[label_col] == s][[unit_col, value_col]].dropna().rename(
-			columns={value_col: "val_s"}
-		)
-		df_none = samples_df[samples_df[label_col] == NO_STRATEGY_LABEL][[unit_col, value_col]].dropna().rename(
-			columns={value_col: "val_none"}
-		)
-		merged = pd.merge(df_s, df_none, on=unit_col, how="inner").sort_values(by=unit_col)
+		df_s = _collapsed[_collapsed[label_col] == s][[unit_col, value_col]].rename(columns={value_col: "val_s"})
+		df_0 = _collapsed[_collapsed[label_col] == NO_STRATEGY_LABEL][[unit_col, value_col]].rename(columns={value_col: "val_0"})
 
+		merged = pd.merge(df_s, df_0, on=unit_col, how="inner").sort_values(by=unit_col)
 		_x = merged["val_s"].to_numpy()
-		_y = merged["val_none"].to_numpy()
+		_y = merged["val_0"].to_numpy()
+
+		n_results[s] = {"n_units": int(len(merged))}
 
 		if len(_x) == 0 or len(_y) == 0:
-			rbs_results[s] = {"p": "n/a", "rbs": "n/a"}
+			rbs_results[s] = {"p": np.nan, "rbs": np.nan}
 			continue
 
 		try:
-			stat, p = mannwhitneyu(_x, _y, alternative="less")
+			stat, p = mannwhitneyu(_x, _y, alternative=DEFAULT_ALTERNATIVE)
 			rbs = compute_rbs(_x, _y, stat)
-			rbs_results[s] = {"p": p, "rbs": rbs}
+			rbs_results[s] = {"p": float(p), "rbs": float(rbs), "u": float(stat)}
 		except ValueError:
-			rbs_results[s] = {"p": "err", "rbs": "err"}
+			rbs_results[s] = {"p": np.nan, "rbs": np.nan}
+
+	# --- Benjamini–Hochberg FDR correction across strategies vs Ø ---
+	raw_ps = []
+	labels_for_bh = []
+	for s, res in rbs_results.items():
+		p = res.get("p")
+		if isinstance(p, float) and np.isfinite(p):
+			if s != NO_STRATEGY_LABEL:
+				labels_for_bh.append(s)
+				raw_ps.append(p)
+
+	if raw_ps:
+		qvals = benjamini_hochberg(raw_ps)
+		for s, q in zip(labels_for_bh, qvals):
+			rbs_results[s]["p_adj"] = float(q)
+
+	# --- OPTIONAL: write stats CSV ---
+	if outpath_stats_csv:
+		rows = []
+		for s in sorted(unique_values, key=lambda k: (k != NO_STRATEGY_LABEL, k)):
+			res = rbs_results.get(s, {})
+			rows.append({
+				"strategy": s,
+				"baseline": NO_STRATEGY_LABEL,
+				"alternative": DEFAULT_ALTERNATIVE,
+				"n_units_aligned": n_results.get(s, {}).get("n_units", np.nan),
+				"u_stat": res.get("u", np.nan),
+				"p_raw": res.get("p", np.nan),
+				"p_fdr": res.get("p_adj", np.nan),
+				"r_rb": res.get("rbs", np.nan),
+				"mean_display_vals": means.get(s, np.nan),      # from aggregated_samples_df
+				"median_display_vals": medians.get(s, np.nan),  # from aggregated_samples_df
+			})
+		pd.DataFrame(rows).to_csv(outpath_stats_csv, index=False)
 
 	# --- Sort labels by ascending effect size (RBS) ---
 	def rbs_key(s):
@@ -363,19 +450,30 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 						alpha=0.9
 					))
 
-	# --- Annotate p-values and RBS ---
+	# --- Annotate p-values (FDR-corrected) and RBS ---
+	alpha = 0.05
 	for i, s in enumerate(labels):
 		stats_result = rbs_results.get(s, {})
 		p = stats_result.get("p", "")
+		p_adj = stats_result.get("p_adj", None)
 		rbs = stats_result.get("rbs", "")
+
 		if isinstance(p, float):
-			p_text = f"p={p:.3f}"
-			if p < 0.001:
-				p_text = f"p<0.001"
+			# use FDR-adjusted p when available
+			p_for_sig = p_adj if isinstance(p_adj, float) else p
+			label = "p(FDR)" if isinstance(p_adj, float) else "p"
+
+			if p_for_sig < 0.001:
+				p_text = f"{label}<0.001"
 			else:
-				p_text = f"p={p:.3f}"
-			rbs_text = fr"$\bf{{r_{{rb}}\!=\!{rbs:.2f}}}$" if p < 0.05 else fr"$r_{{rb}}={rbs:.2f}$"
-			fontweight = "bold" if p < 0.05 else "normal"
+				p_text = f"{label}={p_for_sig:.3f}"
+
+			if isinstance(rbs, (float, int)) and np.isfinite(rbs):
+				rbs_text = fr"$\bf{{r_{{rb}}\!=\!{rbs:.2f}}}$" if p_for_sig < alpha else fr"$r_{{rb}}={rbs:.2f}$"
+			else:
+				rbs_text = r"$r_{rb}=\text{n/a}$"
+
+			fontweight = "bold" if p_for_sig < alpha else "normal"
 		elif p in ["-", "n/a", "err"]:
 			p_text = f"p={p}"
 			rbs_text = fr"$r_{{rb}}={rbs}$"
@@ -402,33 +500,34 @@ def plot_box_by_strategy(aggregated_samples_df, samples_df, label_col, unit_col,
 		plt.show()
 	plt.close()
 
+
 def plot_heatmap(
 	df,
 	outpath_pdf,
 	*,
-	row_col,                     # e.g. "bias", "tier", or "model"
-	col_col="strategy",         # usually "strategy"
+	row_col,
+	col_col="strategy",
 	value_col="sensitivity",
-	samples_df=None,            # raw samples for stats; if None, skip p-values/effect sizes
-	baseline_col_value=NO_STRATEGY_LABEL,   # Ø baseline for Mann–Whitney
-	exclude_from_best=None,     # defaults to [Ø, ProbeAX]; pass [] to include all
-	pre_agg_cols=None,          # optional: group these cols first (e.g. ["bias","tier","strategy"])
-	pre_agg_func="mean",        # used with pre_agg_cols, before pivot; then pivot does median
+	samples_df=None,
+	baseline_col_value=NO_STRATEGY_LABEL,
+	exclude_from_best=None,
+	pre_agg_cols=None,
+	pre_agg_func="mean",
 	outpath_csv=None,
+	outpath_stats_csv=None,   # <-- NEW (tidy/long stats)
+	outpath_pvals_csv=None,   # <-- NEW (wide raw p)
+	outpath_qvals_csv=None,   # <-- NEW (wide row-FDR q)
 	cmap="viridis_r",
 	center=None,
 	fontsize=12,
-	gap_width=0.12,             # narrow whitespace around ProbeAX/Ø
-	show=False                  # mirror args.show_figures behavior if you want
+	gap_width=0.12,
+	show=False
 ):
 	"""
-	Universal heatmap:
-	  - Pivots df by (row_col × col_col) with values = median(value_col) after optional pre-aggregation.
-	  - Orders strategies like `strategy_mapping`, puts ProbeAX first and Ø last (if present).
-	  - Per-row significance: Mann–Whitney U (alternative='less') vs baseline_col_value within each row (if samples_df provided).
-	  - Annotates each cell with value% + stars, and italic r_rb below; bolds the best strategy per row
-		(primary = min metric, tie-break = max |r_rb|), excluding Ø and ProbeAX by default.
-	  - Applies row-wise z-normalization for coloring, shows labels as actual %.
+	Universal heatmap with per-row BH/FDR:
+	  - Per-row tests: strategy vs baseline_col_value.
+	  - BH FDR correction applied within each row's family of tests.
+	  - Stars in cells reflect FDR-adjusted p.
 	"""
 	# ---------- prep & optional pre-aggregation ----------
 	work = df.copy()
@@ -472,13 +571,76 @@ def plot_heatmap(
 				vals_0 = samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_col_value)][value_col].dropna()
 				if len(vals_s) > 0 and len(vals_0) > 0:
 					try:
-						stat, p = mannwhitneyu(vals_s, vals_0, alternative="less")
+						stat, p = mannwhitneyu(vals_s, vals_0, alternative=DEFAULT_ALTERNATIVE)
 						rbs = compute_rbs(vals_s, vals_0, stat)
 						pval_dict[(r, c)] = (p, rbs)
 					except Exception:
 						pval_dict[(r, c)] = (None, 0)
 				else:
 					pval_dict[(r, c)] = (None, 0)
+
+	# ---------- Benjamini–Hochberg FDR correction per row ----------
+	qval_dict = {}
+	if samples_df is not None:
+		for r in pivot_df.index:
+			row_ps = []
+			cols_for_row = []
+			for c in pivot_df.columns:
+				if c == baseline_col_value:
+					continue
+				p = pval_dict.get((r, c), (None, 0))[0]
+				if isinstance(p, float) and np.isfinite(p):
+					row_ps.append(p)
+					cols_for_row.append(c)
+			if row_ps:
+				qvals = benjamini_hochberg(row_ps)
+				for c, q in zip(cols_for_row, qvals):
+					qval_dict[(r, c)] = q
+			# baseline: no adjusted p
+			qval_dict[(r, baseline_col_value)] = None
+
+	# ---------- OPTIONAL: export p-values/effect sizes ----------
+	if samples_df is not None and (outpath_stats_csv or outpath_pvals_csv or outpath_qvals_csv):
+		stats_rows = []
+		for r in pivot_df.index:
+			# baseline sample size for this row
+			n0 = int(samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_col_value)][value_col].dropna().shape[0])
+
+			base_median = pivot_df.loc[r, baseline_col_value] if baseline_col_value in pivot_df.columns else np.nan
+
+			for c in pivot_df.columns:
+				n_s = int(samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == c)][value_col].dropna().shape[0])
+				p_raw, rbs = pval_dict.get((r, c), (None, np.nan))
+				q = qval_dict.get((r, c), None)
+
+				cell_median = pivot_df.loc[r, c]
+				stats_rows.append({
+					row_col: r,
+					col_col: c,
+					"baseline": baseline_col_value,
+					"alternative": DEFAULT_ALTERNATIVE,
+					"n_strategy": n_s,
+					"n_baseline": n0,
+					"median_strategy": float(cell_median) if pd.notna(cell_median) else np.nan,
+					"median_baseline": float(base_median) if pd.notna(base_median) else np.nan,
+					"delta_median": (float(cell_median) - float(base_median)) if (pd.notna(cell_median) and pd.notna(base_median)) else np.nan,
+					"p_raw": float(p_raw) if isinstance(p_raw, float) and np.isfinite(p_raw) else np.nan,
+					"p_fdr_row": float(q) if isinstance(q, float) and np.isfinite(q) else np.nan,
+					"r_rb": float(rbs) if isinstance(rbs, (float, int)) and np.isfinite(rbs) else np.nan,
+				})
+
+		stats_df = pd.DataFrame(stats_rows)
+
+		if outpath_stats_csv:
+			stats_df.to_csv(outpath_stats_csv, index=False)
+
+		if outpath_pvals_csv:
+			p_wide = stats_df.pivot(index=row_col, columns=col_col, values="p_raw")
+			p_wide.to_csv(outpath_pvals_csv)
+
+		if outpath_qvals_csv:
+			q_wide = stats_df.pivot(index=row_col, columns=col_col, values="p_fdr_row")
+			q_wide.to_csv(outpath_qvals_csv)
 
 	# ---------- best-cell mask (min metric; tie-break max |r_rb|) ----------
 	if exclude_from_best is None:
@@ -510,16 +672,21 @@ def plot_heatmap(
 		best_mask.loc[r, :] = False
 		best_mask.loc[r, chosen] = True
 
-	# ---------- annotations (value% + stars) ----------
+	# ---------- annotations (value% + stars based on FDR) ----------
 	ann_df = pivot_df.copy().astype(float)
 	for i, r in enumerate(pivot_df.index):
 		for j, c in enumerate(pivot_df.columns):
 			v = ann_df.loc[r, c]
 			if samples_df is not None:
-				p = pval_dict.get((r, c), (None,))[0]
-				stars = (r"$^{***}$" if p and p < 0.001 else
-						 (r"$^{**}$" if p and p < 0.01 else
-						  (r"$^{*}$" if p and p < 0.05 else "")))
+				p_raw, _ = pval_dict.get((r, c), (None, 0))
+				q = qval_dict.get((r, c))
+				p_use = q if isinstance(q, float) else p_raw
+				if isinstance(p_use, float) and np.isfinite(p_use):
+					stars = (r"$^{***}$" if p_use < 0.001 else
+							 (r"$^{**}$" if p_use < 0.01 else
+							  (r"$^{*}$" if p_use < 0.05 else "")))
+				else:
+					stars = ""
 			else:
 				stars = ""
 			ann_df.loc[r, c] = f"{v:.1f}%{stars}"
@@ -543,7 +710,7 @@ def plot_heatmap(
 	ax.set_xlabel("")
 	plt.xticks(rotation=25, ha="right")
 
-	# Replace spaces in xtick labels with newlines
+	# Replace spaces in yticks with newlines
 	new_labels = [lbl.get_text().replace(" ", "\n") for lbl in ax.get_yticklabels()]
 	ax.set_yticklabels(new_labels)
 
@@ -558,36 +725,31 @@ def plot_heatmap(
 	n_rows, n_cols = pivot_df.shape
 	ann = {(i, j): ax.texts[i * n_cols + j] for i in range(n_rows) for j in range(n_cols)}
 
-	# --- Highlight best cells & add p-values ---
+	# --- Highlight best cells & add r_rb text (independent of FDR threshold) ---
 	for i, r in enumerate(pivot_df.index):
 		for j, c in enumerate(pivot_df.columns):
-			significant_pvalue = (pval_dict[(r, c)][0] and pval_dict[(r, c)][0] < 0.05)
+			p_raw, effect_size = pval_dict.get((r, c), (None, 0))
+			q = qval_dict.get((r, c))
+			p_use = q if isinstance(q, float) else p_raw
+
 			if best_mask.iat[i, j]:
 				t = ann[(i, j)]
 				t.set_fontweight("bold")
-				# t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
-				# t.set_color("yellow")
-			# if best_mask.iat[i, j]:
-			# 	ax.add_patch(plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="magenta", lw=2))
-			# if significant_pvalue:
-			# 	t = ann[(i, j)]
-			# 	t.set_fontweight("bold")
-			# 	t.set_path_effects([pe.withStroke(linewidth=1.5, foreground="black")])
-			# 	t.set_color("yellow")
-			# Add p-value text
-			if samples_df is not None:
-				p, effect_size = pval_dict[(r, c)]
-				p_text = (fr"$r_{{rb}}\!=\!{effect_size:.2f}$" if abs(effect_size) >= 0.01 else fr"$|r_{{rb}}|\!<\!0.01$") if p else ""
-				if p_text not in ["", "-"]:
-					ax.text(
-						j + 0.5, i + 0.67, p_text,
-						ha="center", va="top",
-						fontstyle="italic",
-						fontweight=ax.texts[i * n_cols + j].get_fontweight(),
-						fontsize=fontsize-2,
-						color=ax.texts[i * n_cols + j].get_color(),
-						path_effects=ax.texts[i * n_cols + j].get_path_effects(),
-					)
+
+			if samples_df is not None and p_use is not None and isinstance(effect_size, (float, int)):
+				if abs(effect_size) >= 0.01:
+					p_text = fr"$r_{{rb}}\!=\!{effect_size:.2f}$"
+				else:
+					p_text = fr"$|r_{{rb}}|\!<\!0.01$"
+				ax.text(
+					j + 0.5, i + 0.67, p_text,
+					ha="center", va="top",
+					fontstyle="italic",
+					fontweight=ann[(i, j)].get_fontweight(),
+					fontsize=fontsize-2,
+					color=ann[(i, j)].get_color(),
+					path_effects=ann[(i, j)].get_path_effects(),
+				)
 
 	# special tick colors
 	for c in pivot_df.columns:
@@ -609,6 +771,7 @@ def plot_heatmap(
 	if args.show_figures:
 		plt.show()
 	plt.close()
+
 
 # -----------------------------
 # Main Execution
@@ -671,10 +834,11 @@ def main():
 		aggregated_samples_df=aggregated_samples_overall,
 		samples_df=samples_overall,
 		label_col='strategy',
-		unit_col='bias',   # still match by bias for alignment
+		unit_col='bias',
 		value_col='sensitivity',
 		title='Sensitivity by strategy (distribution across biases × models)',
-		outpath=fig_out
+		outpath=fig_out,
+		outpath_stats_csv=outdir / "stats_pairwise_overall_by_strategy.csv",  # <-- NEW
 	)
 
 	# --- Add "all biases" row ---
@@ -690,8 +854,11 @@ def main():
 		row_col="bias",
 		col_col="strategy",
 		value_col="sensitivity",
-		samples_df=df_with_all,  # for p-values/effect sizes
+		samples_df=df_with_all,
 		outpath_csv=outdir / "pivot_bias_vs_strategy.csv",
+		outpath_stats_csv=outdir / "stats_bias_vs_strategy_long.csv",     # <-- NEW
+		outpath_pvals_csv=outdir / "pvals_bias_vs_strategy.csv",          # <-- NEW
+		outpath_qvals_csv=outdir / "qvals_bias_vs_strategy_fdr.csv",      # <-- NEW
 		fontsize=DEFAULT_FONTSIZE
 	)
 
@@ -705,6 +872,9 @@ def main():
 		value_col="sensitivity",
 		samples_df=df_with_all,
 		outpath_csv=outdir / "pivot_model_vs_strategy.csv",
+		outpath_stats_csv=outdir / "stats_model_vs_strategy_long.csv",    # <-- NEW
+		outpath_pvals_csv=outdir / "pvals_model_vs_strategy.csv",         # <-- NEW
+		outpath_qvals_csv=outdir / "qvals_model_vs_strategy_fdr.csv",     # <-- NEW
 		fontsize=DEFAULT_FONTSIZE
 	)
 
@@ -726,8 +896,10 @@ def main():
 			col_col="strategy",
 			value_col="sensitivity",
 			samples_df=raw_samples_all,
-			pre_agg_cols=None,   # already pre-aggregated above
 			outpath_csv=outdir / "pivot_tier_vs_strategy.csv",
+			outpath_stats_csv=outdir / "stats_tier_vs_strategy_long.csv",     # <-- NEW
+			outpath_pvals_csv=outdir / "pvals_tier_vs_strategy.csv",          # <-- NEW
+			outpath_qvals_csv=outdir / "qvals_tier_vs_strategy_fdr.csv",      # <-- NEW
 			fontsize=DEFAULT_FONTSIZE
 		)
 
@@ -749,7 +921,16 @@ def main():
 
 
 			stats_t = tier_stats[tier_stats['tier'] == tier] if 'tier_stats' in locals() else None
-			plot_box_by_strategy(aggregated_samples_df=aggregated_samples_tier, samples_df=raw_samples_tier, label_col='strategy', unit_col='bias', value_col='sensitivity', title=f'Sensitivity by strategy – Complexity: {tier}', outpath=fig_out_tier)
+			plot_box_by_strategy(
+				aggregated_samples_df=aggregated_samples_tier,
+				samples_df=raw_samples_tier,
+				label_col='strategy',
+				unit_col='bias',
+				value_col='sensitivity',
+				title=f'Sensitivity by strategy – Complexity: {tier}',
+				outpath=fig_out_tier,
+				outpath_stats_csv=outdir / f"stats_pairwise_tier={tier}_by_strategy.csv",  # <-- NEW
+			)
 
 
 	print(f"\nWrote analysis tables and figures to: {outdir.resolve()}\n")
