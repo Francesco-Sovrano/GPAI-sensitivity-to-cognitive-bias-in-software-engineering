@@ -24,7 +24,7 @@ mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype']  = 42
 
 DEFAULT_FONTSIZE = 9
-DEFAULT_ALTERNATIVE = "two-sided" 
+DEFAULT_ALTERNATIVE = "two-sided"
 # DEFAULT_ALTERNATIVE = "less"
 
 # -----------------------------
@@ -55,11 +55,11 @@ args = parser.parse_args()
 # Model Name Mapping & Ordering (used only to locate files)
 # -----------------------------
 model_mapping = {
-	"gpt-4.1-nano": "gpt-4.1-nano", 
-	"gpt-4.1-mini": "gpt-4.1-mini", 
-	"gpt-4o-mini": "gpt-4o-mini", 
-	"llama-3.1-8b-instant": "llama-3.1", 
-	"llama-3.3-70b-versatile": "llama-3.3", 
+	"gpt-4.1-nano": "gpt-4.1-nano",
+	"gpt-4.1-mini": "gpt-4.1-mini",
+	"gpt-4o-mini": "gpt-4o-mini",
+	"llama-3.1-8b-instant": "llama-3.1",
+	"llama-3.3-70b-versatile": "llama-3.3",
 	"deepseek-r1-distill-llama-70b": "deepseek-r1",
 }
 
@@ -74,19 +74,19 @@ strategy_mapping = {
 	NO_STRATEGY_LABEL: [],  # no strategy
 	PROBE_AXIOMS_INJECTION_LABEL: ["inject_axioms"], # cueing with axioms (not a debiasing strategy)
 	## Baseline prompting strategies
-	"CoT": ["chain_of_thought"], 
-	"IMP": ["implication_prompting"], 
-	"IsD": ["impersonified_self_debiasing"], 
-	"BW": ["bias_warning"], 
-	"BW+IsD": ["bias_warning", "impersonified_self_debiasing"], 
+	"CoT": ["chain_of_thought"],
+	"IMP": ["implication_prompting"],
+	"IsD": ["impersonified_self_debiasing"],
+	"BW": ["bias_warning"],
+	"BW+IsD": ["bias_warning", "impersonified_self_debiasing"],
 	## Our prompting strategies
-	"2sAX": ["bistep_axioms_elicitation"], 
-	"2sAX+BW": ["bias_warning", "bistep_axioms_elicitation"], 
-	"sAX": ["self_axioms_elicitation"], 
+	"2sAX": ["bistep_axioms_elicitation"],
+	"2sAX+BW": ["bias_warning", "bistep_axioms_elicitation"],
+	"sAX": ["self_axioms_elicitation"],
 	"sAX+BW": ["bias_warning", "self_axioms_elicitation"],
 	"sAX+BW+IsD": ["bias_warning", "impersonified_self_debiasing", "self_axioms_elicitation"],
-	# "sAX+BW+2sAX": ["bias_warning", "bistep_axioms_elicitation", "self_axioms_elicitation"], 
-	# "AllGood": ["bias_warning", "impersonified_self_debiasing", "bistep_axioms_elicitation", "self_axioms_elicitation"], 
+	# "sAX+BW+2sAX": ["bias_warning", "bistep_axioms_elicitation", "self_axioms_elicitation"],
+	# "AllGood": ["bias_warning", "impersonified_self_debiasing", "bistep_axioms_elicitation", "self_axioms_elicitation"],
 }
 
 # -----------------------------
@@ -271,7 +271,7 @@ def plot_box_by_strategy(
 	label_col, unit_col, value_col,
 	title, outpath,
 	fontsize=DEFAULT_FONTSIZE,
-	outpath_stats_csv=None,   # <-- NEW
+	outpath_stats_csv=None,
 ):
 	# --- Collect basic per-label stats into dicts ---
 	unique_values = aggregated_samples_df[label_col].dropna().unique().tolist()
@@ -304,53 +304,56 @@ def plot_box_by_strategy(
 
 	for s in unique_values:
 		if s == NO_STRATEGY_LABEL:
-			rbs_results[s] = {"p": np.nan, "rbs": 0.0}
+			rbs_results[s] = {"p": np.nan, "rbs": 0.0, "baseline": ""}
 			n_results[s] = {"n_units": np.nan}
 			continue
 
 		df_s = _collapsed[_collapsed[label_col] == s][[unit_col, value_col]].rename(columns={value_col: "val_s"})
-		df_0 = _collapsed[_collapsed[label_col] == NO_STRATEGY_LABEL][[unit_col, value_col]].rename(columns={value_col: "val_0"})
 
-		merged = pd.merge(df_s, df_0, on=unit_col, how="inner").sort_values(by=unit_col)
+		# Global baseline: always compare every method to Ø
+		baseline = NO_STRATEGY_LABEL
+
+		df_b = _collapsed[_collapsed[label_col] == baseline][[unit_col, value_col]].rename(columns={value_col: "val_b"})
+		merged = pd.merge(df_s, df_b, on=unit_col, how="inner").sort_values(by=unit_col)
 		_x = merged["val_s"].to_numpy()
-		_y = merged["val_0"].to_numpy()
+		_y = merged["val_b"].to_numpy()
 
 		n_results[s] = {"n_units": int(len(merged))}
 
 		if len(_x) == 0 or len(_y) == 0:
-			rbs_results[s] = {"p": np.nan, "rbs": np.nan}
+			rbs_results[s] = {"p": np.nan, "rbs": np.nan, "baseline": baseline}
 			continue
 
 		try:
 			stat, p = mannwhitneyu(_x, _y, alternative=DEFAULT_ALTERNATIVE)
 			rbs = compute_rbs(_x, _y, stat)
-			rbs_results[s] = {"p": float(p), "rbs": float(rbs), "u": float(stat)}
+			rbs_results[s] = {"p": float(p), "rbs": float(rbs), "u": float(stat), "baseline": baseline}
 		except ValueError:
-			rbs_results[s] = {"p": np.nan, "rbs": np.nan}
+			rbs_results[s] = {"p": np.nan, "rbs": np.nan, "baseline": baseline}
 
-	# --- Benjamini–Hochberg FDR correction across strategies vs Ø ---
+	# --- Benjamini–Hochberg FDR correction (all methods vs Ø) ---
 	raw_ps = []
 	labels_for_bh = []
 	for s, res in rbs_results.items():
+		if s == NO_STRATEGY_LABEL:
+			continue
 		p = res.get("p")
 		if isinstance(p, float) and np.isfinite(p):
-			if s != NO_STRATEGY_LABEL:
-				labels_for_bh.append(s)
-				raw_ps.append(p)
+			labels_for_bh.append(s)
+			raw_ps.append(p)
 
 	if raw_ps:
 		qvals = benjamini_hochberg(raw_ps)
 		for s, q in zip(labels_for_bh, qvals):
 			rbs_results[s]["p_adj"] = float(q)
-
-	# --- OPTIONAL: write stats CSV ---
+# --- OPTIONAL: write stats CSV ---
 	if outpath_stats_csv:
 		rows = []
 		for s in sorted(unique_values, key=lambda k: (k != NO_STRATEGY_LABEL, k)):
 			res = rbs_results.get(s, {})
 			rows.append({
 				"strategy": s,
-				"baseline": NO_STRATEGY_LABEL,
+				"baseline": res.get("baseline", NO_STRATEGY_LABEL),
 				"alternative": DEFAULT_ALTERNATIVE,
 				"n_units_aligned": n_results.get(s, {}).get("n_units", np.nan),
 				"u_stat": res.get("u", np.nan),
@@ -396,28 +399,32 @@ def plot_box_by_strategy(
 	plt.ylabel("Sensitivity")
 	plt.title(title)
 
-	# special tick colors
+	# Accessibility: use typography (bold) rather than color for special columns
 	ax = plt.gca()
 	for c in labels:
-		if c in [PROBE_AXIOMS_INJECTION_LABEL,NO_STRATEGY_LABEL]:
+		if c in [PROBE_AXIOMS_INJECTION_LABEL, NO_STRATEGY_LABEL]:
 			idx = labels.index(c)
-			ax.get_xticklabels()[idx].set_color("tab:red")
 			ax.get_xticklabels()[idx].set_fontweight("bold")
-			t = ax.xaxis.get_major_ticks()[idx]
-			t.tick1line.set_color("tab:red"); t.tick2line.set_color("tab:red")
 		elif 'AX' in c:
 			idx = labels.index(c)
-			ax.get_xticklabels()[idx].set_color("tab:green")
 			ax.get_xticklabels()[idx].set_fontweight("bold")
-			t = ax.xaxis.get_major_ticks()[idx]
-			t.tick1line.set_color("tab:green"); t.tick2line.set_color("tab:green")
 
-	# --- Compute axis limits and spacing ---
-	finite_maxes = [np.nanmax(v) for v in data.values() if v.size]
-	finite_mins = [np.nanmin(v) for v in data.values() if v.size]
-	data_max = np.nanmax(finite_maxes) if finite_maxes else 1.0
-	data_min = np.nanmin(finite_mins) if finite_mins else 0.0
-	y_range = (data_max - data_min) if np.isfinite(data_max) and np.isfinite(data_min) else 1.0
+	# --- Compute axis limits and spacing (robust to empty/NaN-only groups) ---
+	finite_vals = []
+	for v in data.values():
+		if v is None or np.size(v) == 0:
+			continue
+		v = np.asarray(v, dtype=float)
+		v = v[np.isfinite(v)]
+		if v.size:
+			finite_vals.append(v)
+	if finite_vals:
+		allv = np.concatenate(finite_vals)
+		data_min = float(np.min(allv))
+		data_max = float(np.max(allv))
+	else:
+		data_min, data_max = 0.0, 1.0
+	y_range = (data_max - data_min) if np.isfinite(data_max) and np.isfinite(data_min) and data_max != data_min else 1.0
 	y_offset_mean = 0.01 * y_range
 	y_offset_median = 0.01 * y_range
 	y_offset_stats = 0.06 * y_range
@@ -453,6 +460,8 @@ def plot_box_by_strategy(
 	# --- Annotate p-values (FDR-corrected) and RBS ---
 	alpha = 0.05
 	for i, s in enumerate(labels):
+		if s == NO_STRATEGY_LABEL:
+			continue
 		stats_result = rbs_results.get(s, {})
 		p = stats_result.get("p", "")
 		p_adj = stats_result.get("p_adj", None)
@@ -495,7 +504,7 @@ def plot_box_by_strategy(
 		)
 
 	plt.tight_layout()
-	plt.savefig(outpath, dpi=200, bbox_inches="tight")
+	plt.savefig(outpath, dpi=200, bbox_inches="tight", pad_inches=0)
 	if args.show_figures:
 		plt.show()
 	plt.close()
@@ -514,13 +523,16 @@ def plot_heatmap(
 	pre_agg_cols=None,
 	pre_agg_func="mean",
 	outpath_csv=None,
-	outpath_stats_csv=None,   # <-- NEW (tidy/long stats)
-	outpath_pvals_csv=None,   # <-- NEW (wide raw p)
-	outpath_qvals_csv=None,   # <-- NEW (wide row-FDR q)
+	outpath_stats_csv=None,
+	outpath_pvals_csv=None,
+	outpath_qvals_csv=None,
+	split_strategy_groups=False,
+	# Optional titles for the two strategy slices (RQ1 vs RQ2)
+	split_titles=("RQ1: Baseline strategies", "RQ2: Proposed AX strategies"),
 	cmap="viridis_r",
 	center=None,
 	fontsize=12,
-	gap_width=0.12,
+	gap_width=0.06,
 	show=False
 ):
 	"""
@@ -559,20 +571,40 @@ def plot_heatmap(
 	if outpath_csv:
 		pivot_df.to_csv(outpath_csv)
 
+	
+	# Strategy grouping (used for slicing and for selecting the appropriate baseline in tests)
+	_RQ2_PROPOSED = ["2sAX", "2sAX+BW", "sAX", "sAX+BW", "sAX+BW+IsD"]
+
+	def _baseline_for_col(col_name):
+		"""Return the baseline strategy to compare against for this column, or None if not applicable.
+
+		User-specified baseline logic:
+		- Ø (empty set) is the single global baseline and is never tested (it would be compared to itself).
+		- Every other method (including ProbeAX and all AX variants) is compared to Ø.
+		"""
+		if col_name == baseline_col_value:
+			return None
+		return baseline_col_value
+
+		if col_col == "strategy" and col_name in _RQ2_PROPOSED and PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
+			return PROBE_AXIOMS_INJECTION_LABEL
+		return baseline_col_value
+
 	# ---------- per-row p-values & rank-biserial effect sizes ----------
 	pval_dict = {}
 	if samples_df is not None:
 		for r in pivot_df.index:
 			for c in pivot_df.columns:
-				if c == baseline_col_value:
+				baseline_name = _baseline_for_col(c)
+				if baseline_name is None:
 					pval_dict[(r, c)] = (None, 0)
 					continue
 				vals_s = samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == c)][value_col].dropna()
-				vals_0 = samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_col_value)][value_col].dropna()
-				if len(vals_s) > 0 and len(vals_0) > 0:
+				vals_b = samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_name)][value_col].dropna()
+				if len(vals_s) > 0 and len(vals_b) > 0:
 					try:
-						stat, p = mannwhitneyu(vals_s, vals_0, alternative=DEFAULT_ALTERNATIVE)
-						rbs = compute_rbs(vals_s, vals_0, stat)
+						stat, p = mannwhitneyu(vals_s, vals_b, alternative=DEFAULT_ALTERNATIVE)
+						rbs = compute_rbs(vals_s, vals_b, stat)
 						pval_dict[(r, c)] = (p, rbs)
 					except Exception:
 						pval_dict[(r, c)] = (None, 0)
@@ -586,7 +618,9 @@ def plot_heatmap(
 			row_ps = []
 			cols_for_row = []
 			for c in pivot_df.columns:
-				if c == baseline_col_value:
+				# skip columns that are not tested (their baseline is None)
+				if _baseline_for_col(c) is None:
+					qval_dict[(r, c)] = None
 					continue
 				p = pval_dict.get((r, c), (None, 0))[0]
 				if isinstance(p, float) and np.isfinite(p):
@@ -596,31 +630,33 @@ def plot_heatmap(
 				qvals = benjamini_hochberg(row_ps)
 				for c, q in zip(cols_for_row, qvals):
 					qval_dict[(r, c)] = q
-			# baseline: no adjusted p
-			qval_dict[(r, baseline_col_value)] = None
 
 	# ---------- OPTIONAL: export p-values/effect sizes ----------
 	if samples_df is not None and (outpath_stats_csv or outpath_pvals_csv or outpath_qvals_csv):
 		stats_rows = []
 		for r in pivot_df.index:
-			# baseline sample size for this row
-			n0 = int(samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_col_value)][value_col].dropna().shape[0])
-
-			base_median = pivot_df.loc[r, baseline_col_value] if baseline_col_value in pivot_df.columns else np.nan
-
 			for c in pivot_df.columns:
+				baseline_name = _baseline_for_col(c)
 				n_s = int(samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == c)][value_col].dropna().shape[0])
+
+				if baseline_name is None:
+					n_b = 0
+					base_median = np.nan
+				else:
+					n_b = int(samples_df[(samples_df[row_col] == r) & (samples_df[col_col] == baseline_name)][value_col].dropna().shape[0])
+					base_median = pivot_df.loc[r, baseline_name] if baseline_name in pivot_df.columns else np.nan
+
 				p_raw, rbs = pval_dict.get((r, c), (None, np.nan))
 				q = qval_dict.get((r, c), None)
-
 				cell_median = pivot_df.loc[r, c]
+
 				stats_rows.append({
 					row_col: r,
 					col_col: c,
-					"baseline": baseline_col_value,
+					"baseline": baseline_name if baseline_name is not None else "",
 					"alternative": DEFAULT_ALTERNATIVE,
 					"n_strategy": n_s,
-					"n_baseline": n0,
+					"n_baseline": n_b,
 					"median_strategy": float(cell_median) if pd.notna(cell_median) else np.nan,
 					"median_baseline": float(base_median) if pd.notna(base_median) else np.nan,
 					"delta_median": (float(cell_median) - float(base_median)) if (pd.notna(cell_median) and pd.notna(base_median)) else np.nan,
@@ -644,7 +680,7 @@ def plot_heatmap(
 
 	# ---------- best-cell mask (min metric; tie-break max |r_rb|) ----------
 	if exclude_from_best is None:
-		exclude_from_best = [baseline_col_value, PROBE_AXIOMS_INJECTION_LABEL]
+		exclude_from_best = [baseline_col_value]
 	best_mask = pivot_df.notna() & False
 	effect_df = pivot_df.copy().astype(float)
 	effect_df.loc[:, :] = float("nan")
@@ -693,81 +729,177 @@ def plot_heatmap(
 
 	# ---------- color by row-normalized z, label with actual % ----------
 	z = (pivot_df - pivot_df.mean(axis=1).values[:, None]) / pivot_df.std(axis=1).replace(0, np.nan).values[:, None]
-	plt.figure(figsize=(len(pivot_df.columns) * .9, max(2.8, len(pivot_df) * 0.55)))
-	ax = sns.heatmap(
-		z,
-		annot=ann_df,
-		fmt="",
-		vmin=np.nanpercentile(z.values, 20),
-		vmax=np.nanpercentile(z.values, 80),
-		cmap=cmap,
-		center=center,
-		cbar_kws={"label": "Row-norm z", "pad": 0.01, "aspect": 30},
-		linewidths=0.5,
-		linecolor="gray"
-	)
-	ax.set_ylabel("")
-	ax.set_xlabel("")
-	plt.xticks(rotation=25, ha="right")
+	vmin = np.nanpercentile(z.values, 20)
+	vmax = np.nanpercentile(z.values, 80)
 
-	# Replace spaces in yticks with newlines
-	new_labels = [lbl.get_text().replace(" ", "\n") for lbl in ax.get_yticklabels()]
-	ax.set_yticklabels(new_labels)
+	# Strategy slicing (to reduce density): RQ1 (baseline) vs RQ2 (proposed AX strategies)
+	def _strategy_slices(cols):
+		# Density reduction layout:
+		#   [Ø baseline] | [RQ1 baseline prompting] | [RQ2 AX prompting]
+		# Ø is shown once (left) because it is the common baseline for *all* methods.
+		baseline_methods = ["CoT", "IMP", "IsD", "BW", "BW+IsD"]
+		proposed_methods = [PROBE_AXIOMS_INJECTION_LABEL, "2sAX", "2sAX+BW", "sAX", "sAX+BW", "sAX+BW+IsD"]
 
-	# subtle gaps around Ø and after ProbeAX
-	if baseline_col_value in pivot_df.columns:
-		idx = pivot_df.columns.get_loc(baseline_col_value)
-		ax.axvspan(idx - gap_width/2, idx + gap_width/2, color=ax.figure.get_facecolor(), zorder=6, lw=1)
-	if PROBE_AXIOMS_INJECTION_LABEL in pivot_df.columns:
-		idx = pivot_df.columns.get_loc(PROBE_AXIOMS_INJECTION_LABEL) + 1
-		ax.axvspan(idx - gap_width/2, idx + gap_width/2, color=ax.figure.get_facecolor(), zorder=6, lw=1)
+		out = []
 
-	n_rows, n_cols = pivot_df.shape
-	ann = {(i, j): ax.texts[i * n_cols + j] for i in range(n_rows) for j in range(n_cols)}
+		# Panel 0 (common baseline)
+		if baseline_col_value in cols:
+			# out.append(("Baseline (Ø)", [baseline_col_value]))
+			out.append(("", [baseline_col_value]))
 
-	# --- Highlight best cells & add r_rb text (independent of FDR threshold) ---
-	for i, r in enumerate(pivot_df.index):
-		for j, c in enumerate(pivot_df.columns):
-			p_raw, effect_size = pval_dict.get((r, c), (None, 0))
-			q = qval_dict.get((r, c))
-			p_use = q if isinstance(q, float) else p_raw
+		# Panel 1 (RQ1)
+		s1 = [c for c in baseline_methods if c in cols]
+		if s1:
+			out.append((split_titles[0] if split_titles else "", s1))
 
-			if best_mask.iat[i, j]:
-				t = ann[(i, j)]
-				t.set_fontweight("bold")
+		# Panel 2 (RQ2)
+		s2 = [c for c in proposed_methods if c in cols and c != baseline_col_value]
+		if s2:
+			# If the caller only provided two titles, use the second for RQ2.
+			title = split_titles[1] if (split_titles and len(split_titles) > 1) else ""
+			out.append((title, s2))
 
-			if samples_df is not None and p_use is not None and isinstance(effect_size, (float, int)):
-				if abs(effect_size) >= 0.01:
-					p_text = fr"$r_{{rb}}\!=\!{effect_size:.2f}$"
-				else:
-					p_text = fr"$|r_{{rb}}|\!<\!0.01$"
-				ax.text(
-					j + 0.5, i + 0.67, p_text,
-					ha="center", va="top",
-					fontstyle="italic",
-					fontweight=ann[(i, j)].get_fontweight(),
-					fontsize=fontsize-2,
-					color=ann[(i, j)].get_color(),
-					path_effects=ann[(i, j)].get_path_effects(),
-				)
+		# Fallback: if slicing isn't meaningful, plot a single heatmap.
+		if len(out) < 2:
+			out = [("", [c for c in _ordered_strategy_columns(cols)])]
+		return out
 
-	# special tick colors
-	for c in pivot_df.columns:
-		if c in [PROBE_AXIOMS_INJECTION_LABEL,baseline_col_value]:
-			idx = pivot_df.columns.get_loc(c)
-			ax.get_xticklabels()[idx].set_color("tab:red")
-			ax.get_xticklabels()[idx].set_fontweight("bold")
-			t = ax.xaxis.get_major_ticks()[idx]
-			t.tick1line.set_color("tab:red"); t.tick2line.set_color("tab:red")
-		elif 'AX' in c:
-			idx = pivot_df.columns.get_loc(c)
-			ax.get_xticklabels()[idx].set_color("tab:green")
-			ax.get_xticklabels()[idx].set_fontweight("bold")
-			t = ax.xaxis.get_major_ticks()[idx]
-			t.tick1line.set_color("tab:green"); t.tick2line.set_color("tab:green")
+	def _format_ytick(text):
+		if row_col == "tier":
+			m = {
+				"low": "Low complexity",
+				"mid-low": "Mid-low complexity",
+				"mid-high": "Mid-high complexity",
+				"high": "High complexity",
+			}
+			text = m.get(text, text)
+		return text.replace(" ", "\n")
 
+	def _add_gaps(ax, cols):
+		# subtle gaps around Ø and after ProbeAX (if present in this slice)
+		if baseline_col_value in cols and len(cols) > 1:
+			idx = cols.index(baseline_col_value)
+			ax.axvspan(idx - gap_width/2, idx + gap_width/2, color=ax.figure.get_facecolor(), zorder=6, lw=1)
+		if PROBE_AXIOMS_INJECTION_LABEL in cols:
+			idx = cols.index(PROBE_AXIOMS_INJECTION_LABEL) + 1
+			ax.axvspan(idx - gap_width/2, idx + gap_width/2, color=ax.figure.get_facecolor(), zorder=6, lw=1)
+
+	def _bold_special_xticks(ax, cols):
+		# Accessibility: use typography (bold) rather than color for special columns.
+		for special in [PROBE_AXIOMS_INJECTION_LABEL, baseline_col_value]:
+			if special in cols:
+				idx = cols.index(special)
+				ax.get_xticklabels()[idx].set_fontweight("bold")
+
+	def _decorate_cells(ax, cols, n_rows):
+		# seaborn puts annotation texts first, row-major
+		n_cols = len(cols)
+		ann_texts = ax.texts[: n_rows * n_cols]
+		ann = {(i, j): ann_texts[i * n_cols + j] for i in range(n_rows) for j in range(n_cols)}
+
+		for i, r in enumerate(pivot_df.index):
+			for j, c in enumerate(cols):
+				p_raw, effect_size = pval_dict.get((r, c), (None, 0))
+				q = qval_dict.get((r, c))
+				p_use = q if isinstance(q, float) else p_raw
+
+				if c in pivot_df.columns and best_mask.loc[r, c]:
+					ann[(i, j)].set_fontweight("bold")
+
+				if samples_df is not None and p_use is not None and isinstance(effect_size, (float, int)):
+					if abs(effect_size) >= 0.01:
+						p_text = fr"$r_{{rb}}\!=\!{effect_size:.2f}$"
+					else:
+						p_text = fr"$|r_{{rb}}|\!<\!0.01$"
+					ax.text(
+						j + 0.5, i + 0.67, p_text,
+						ha="center", va="top",
+						fontstyle="italic",
+						fontweight=ann[(i, j)].get_fontweight(),
+						fontsize=fontsize-2,
+						color=ann[(i, j)].get_color(),
+						path_effects=ann[(i, j)].get_path_effects(),
+					)
+
+	# ---------- plot (single or sliced) ----------
+	if split_strategy_groups and col_col == "strategy":
+		slices = _strategy_slices(list(pivot_df.columns))
+		height = max(2.8, len(pivot_df) * 0.55)
+		width = sum(len(cols) for _, cols in slices) * 0.75 + 0.8 * (len(slices) - 1)
+		fig, axes = plt.subplots(
+			1, len(slices),
+			figsize=(max(6.5, width), height),
+			sharey=False,
+			gridspec_kw={"width_ratios": [len(cols) for _, cols in slices], "wspace": 0.08}
+		)
+		if not isinstance(axes, (list, np.ndarray)):
+			axes = [axes]
+
+		for si, (title, cols) in enumerate(slices):
+			ax = axes[si]
+			z_sub = z[cols]
+			ann_sub = ann_df[cols]
+			sns.heatmap(
+				z_sub,
+				annot=ann_sub,
+				fmt="",
+				vmin=vmin,
+				vmax=vmax,
+				cmap=cmap,
+				center=center,
+				cbar=(si == len(slices) - 1),
+				cbar_kws={"label": "Row-norm z", "pad": 0.01, "aspect": 30} if (si == len(slices) - 1) else None,
+				linewidths=0.05,
+				linecolor="gray",
+				ax=ax,
+				yticklabels=[_format_ytick(str(v)) for v in z_sub.index] if si == 0 else False
+			)
+			ax.set_ylabel("")
+			ax.set_xlabel("")
+			ax.set_xticklabels(ax.get_xticklabels(), rotation=25, ha="right")
+			_bold_special_xticks(ax, cols)
+			_add_gaps(ax, cols)
+
+			# y tick labels only on the first slice (explicitly set to avoid them disappearing)
+			if si == 0:
+				ax.tick_params(axis='y', labelleft=True, left=True)
+				ax.set_yticks(np.arange(len(z_sub.index)) + 0.5)
+				ax.set_yticklabels([_format_ytick(str(v)) for v in z_sub.index], rotation=0)
+				ax.tick_params(axis="y", labelsize=fontsize)
+			else:
+				ax.set_yticklabels([])
+				ax.tick_params(axis='y', labelleft=False, left=False)
+
+			if title:
+				ax.set_title(title, fontsize=fontsize+1)
+
+			_decorate_cells(ax, cols, n_rows=len(pivot_df.index))
+
+		plt.subplots_adjust(wspace=0.0, left=0.0)
+	else:
+		plt.figure(figsize=(len(pivot_df.columns) * .9, max(2.8, len(pivot_df) * 0.55)))
+		ax = sns.heatmap(
+			z,
+			annot=ann_df,
+			fmt="",
+			vmin=vmin,
+			vmax=vmax,
+			cmap=cmap,
+			center=center,
+			cbar_kws={"label": "Row-norm z", "pad": 0.01, "aspect": 30},
+			linewidths=0.5,
+			linecolor="gray"
+		)
+		ax.set_ylabel("")
+		ax.set_xlabel("")
+		plt.xticks(rotation=25, ha="right")
+		ax.set_yticklabels([_format_ytick(t.get_text()) for t in ax.get_yticklabels()])
+
+		_add_gaps(ax, list(pivot_df.columns))
+		_bold_special_xticks(ax, list(pivot_df.columns))
+		_decorate_cells(ax, list(pivot_df.columns), n_rows=len(pivot_df.index))
 	plt.tight_layout()
-	plt.savefig(outpath_pdf, dpi=250, bbox_inches="tight")
+	plt.savefig(outpath_pdf, dpi=250, bbox_inches="tight", pad_inches=0)
 	if args.show_figures:
 		plt.show()
 	plt.close()
@@ -838,7 +970,7 @@ def main():
 		value_col='sensitivity',
 		title='Sensitivity by strategy (distribution across biases × models)',
 		outpath=fig_out,
-		outpath_stats_csv=outdir / "stats_pairwise_overall_by_strategy.csv",  # <-- NEW
+		outpath_stats_csv=outdir / "stats_pairwise_overall_by_strategy.csv",
 	)
 
 	# --- Add "all biases" row ---
@@ -856,10 +988,11 @@ def main():
 		value_col="sensitivity",
 		samples_df=df_with_all,
 		outpath_csv=outdir / "pivot_bias_vs_strategy.csv",
-		outpath_stats_csv=outdir / "stats_bias_vs_strategy_long.csv",     # <-- NEW
-		outpath_pvals_csv=outdir / "pvals_bias_vs_strategy.csv",          # <-- NEW
-		outpath_qvals_csv=outdir / "qvals_bias_vs_strategy_fdr.csv",      # <-- NEW
-		fontsize=DEFAULT_FONTSIZE
+		outpath_stats_csv=outdir / "stats_bias_vs_strategy_long.csv",
+		outpath_pvals_csv=outdir / "pvals_bias_vs_strategy.csv",
+		outpath_qvals_csv=outdir / "qvals_bias_vs_strategy_fdr.csv",
+		fontsize=DEFAULT_FONTSIZE,
+		split_strategy_groups=True
 	)
 
 	# 3) Model × Strategy (the new “strategy vs model” view)
@@ -872,10 +1005,11 @@ def main():
 		value_col="sensitivity",
 		samples_df=df_with_all,
 		outpath_csv=outdir / "pivot_model_vs_strategy.csv",
-		outpath_stats_csv=outdir / "stats_model_vs_strategy_long.csv",    # <-- NEW
-		outpath_pvals_csv=outdir / "pvals_model_vs_strategy.csv",         # <-- NEW
-		outpath_qvals_csv=outdir / "qvals_model_vs_strategy_fdr.csv",     # <-- NEW
-		fontsize=DEFAULT_FONTSIZE
+		outpath_stats_csv=outdir / "stats_model_vs_strategy_long.csv",
+		outpath_pvals_csv=outdir / "pvals_model_vs_strategy.csv",
+		outpath_qvals_csv=outdir / "qvals_model_vs_strategy_fdr.csv",
+		fontsize=DEFAULT_FONTSIZE,
+		split_strategy_groups=True
 	)
 
 	# Per-tier: distribution across biases within each tier
@@ -897,10 +1031,11 @@ def main():
 			value_col="sensitivity",
 			samples_df=raw_samples_all,
 			outpath_csv=outdir / "pivot_tier_vs_strategy.csv",
-			outpath_stats_csv=outdir / "stats_tier_vs_strategy_long.csv",     # <-- NEW
-			outpath_pvals_csv=outdir / "pvals_tier_vs_strategy.csv",          # <-- NEW
-			outpath_qvals_csv=outdir / "qvals_tier_vs_strategy_fdr.csv",      # <-- NEW
-			fontsize=DEFAULT_FONTSIZE
+			outpath_stats_csv=outdir / "stats_tier_vs_strategy_long.csv",
+			outpath_pvals_csv=outdir / "pvals_tier_vs_strategy.csv",
+			outpath_qvals_csv=outdir / "qvals_tier_vs_strategy_fdr.csv",
+			fontsize=DEFAULT_FONTSIZE,
+			split_strategy_groups=True
 		)
 
 		for tier in (strat_tier['tier'].cat.categories if hasattr(strat_tier['tier'], 'cat') else sorted(strat_tier['tier'].unique())):
@@ -929,7 +1064,7 @@ def main():
 				value_col='sensitivity',
 				title=f'Sensitivity by strategy – Complexity: {tier}',
 				outpath=fig_out_tier,
-				outpath_stats_csv=outdir / f"stats_pairwise_tier={tier}_by_strategy.csv",  # <-- NEW
+				outpath_stats_csv=outdir / f"stats_pairwise_tier={tier}_by_strategy.csv",
 			)
 
 
