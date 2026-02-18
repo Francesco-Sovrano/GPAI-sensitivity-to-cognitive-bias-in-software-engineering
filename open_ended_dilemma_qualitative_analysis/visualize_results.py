@@ -5,15 +5,15 @@ Loads two CSVs (one per model), analyzes Sensitivity_BASE vs Sensitivity_OURS,
 and renders figures plus a summary table.
 
 Defaults:
-  --gpt_csv /mnt/data/extracted_gpt41_checked.csv
-  --llama_csv /mnt/data/extracted_llama_check.csv
-  --out_dir  /mnt/data
+	--gpt_csv manually_analyzed_data/resolved_conflict/extracted_gpt4o_checked.csv
+	--llama_csv manually_analyzed_data/resolved_conflict/extracted_llama_check.csv
+	--out_dir  manually_analyzed_data
 
 Usage example:
-  python open_ended_bias_sensitivity_analysis.py \
-	  --gpt_csv /mnt/data/extracted_gpt41_checked.csv \
-	  --llama_csv /mnt/data/extracted_llama_check.csv \
-	  --out_dir /mnt/data
+	python3 visualize_results.py \
+		--gpt_csv manually_analyzed_data/resolved_conflict/extracted_gpt4o_checked.csv \
+		--llama_csv manually_analyzed_data/resolved_conflict/extracted_llama_check.csv \
+		--out_dir manually_analyzed_data
 """
 
 import argparse
@@ -37,15 +37,17 @@ def smart_read_csv(path: Path) -> pd.DataFrame:
 
 
 def prep_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-	"""Coerce Sensitivity columns to {0,1} and drop missing pairs."""
-	df = df.copy()
-	for col in ["Sensitivity_BASE", "Sensitivity_OURS"]:
-		df[col] = pd.to_numeric(df[col], errors="coerce")
-	df = df.dropna(subset=["Sensitivity_BASE", "Sensitivity_OURS"])
-	df["Sensitivity_BASE"] = df["Sensitivity_BASE"].clip(0, 1)
-	df["Sensitivity_OURS"] = df["Sensitivity_OURS"].clip(0, 1)
-	print(len(df))
-	return df
+		df = df.copy()
+		for col in ["Sensitivity_BASE", "Sensitivity_OURS"]:
+				df[col] = pd.to_numeric(df[col], errors="coerce")
+
+		df = df.dropna(subset=["Sensitivity_BASE", "Sensitivity_OURS"])
+
+		for col in ["Sensitivity_BASE", "Sensitivity_OURS"]:
+				df[col] = df[col].clip(0, 1).round().astype(np.int8)
+
+		print(len(df))
+		return df
 
 
 def bootstrap_ci_mean(arr: np.ndarray, n_boot: int = 10000, alpha: float = 0.05, seed: int = 123):
@@ -143,47 +145,100 @@ def summarize_model(df: pd.DataFrame, model_name: str) -> dict:
 	}
 
 
-def plot_mean_bars(models: dict, out_path: Path):
-	"""Bar chart of mean sensitivity (BASE vs OURS) per model with bootstrap 95% CI."""
-	labels = []
-	means = []
-	ci_lows = []
-	ci_highs = []
-	colors = []
 
-	for model_name, df in models.items():
+def plot_mean_bars(models: dict, out_path: Path):
+	"""
+	Compact grouped bar chart of mean bias sensitivity (BASE vs OURS) per model with bootstrap 95% CI.
+
+	Changes vs the original:
+	- grouped bars per model (shorter x-axis labels)
+	- larger default fonts
+	- narrower bars + tighter margins (more compact PDF)
+	"""
+	model_names = list(models.keys())
+
+	base_means, ours_means = [], []
+	base_err_low, base_err_high = [], []
+	ours_err_low, ours_err_high = [], []
+
+	for model_name in model_names:
+		df = models[model_name]
 		base = df["Sensitivity_BASE"].to_numpy()
 		ours = df["Sensitivity_OURS"].to_numpy()
-		for strategy, arr in [("Ø", base), ("sAX+BW", ours)]:
-			labels.append(f"{model_name}\n{strategy}")
-			m = arr.mean()
-			ci = bootstrap_ci_mean(arr)
-			means.append(m)
-			ci_lows.append(m - ci[0])
-			ci_highs.append(ci[1] - m)
-			# Assign colors depending on strategy
-			colors.append("steelblue" if strategy == "Ø" else "darkorange")
 
-	x = np.arange(len(labels))
-	plt.figure(figsize=(7, 4))
-	plt.bar(x, means, color=colors)
-	plt.errorbar(x, means, yerr=[ci_lows, ci_highs], fmt='none', capsize=5, color="black")
-	plt.xticks(x, labels)
-	plt.ylabel("Mean Bias Sensitivity (rate)")
-	# plt.title("Open-Ended Dilemmas: Bias Sensitivity\nBaseline vs sAX+BW")
-	plt.ylim(0, 1)
-	for xi, m in zip(x, means):
-		plt.text(xi, m, f"{m:.2f}", ha='center', va='bottom', fontsize=9, bbox=dict(
-			boxstyle="round,pad=0.2",
-			facecolor="white",
-			edgecolor="none",
-			alpha=0.9
-		))
-	plt.tight_layout()
-	plt.savefig(out_path)
-	plt.close()
+		m_base = float(base.mean())
+		ci_base = bootstrap_ci_mean(base)
+		base_means.append(m_base)
+		base_err_low.append(m_base - ci_base[0])
+		base_err_high.append(ci_base[1] - m_base)
 
+		m_ours = float(ours.mean())
+		ci_ours = bootstrap_ci_mean(ours)
+		ours_means.append(m_ours)
+		ours_err_low.append(m_ours - ci_ours[0])
+		ours_err_high.append(ci_ours[1] - m_ours)
 
+	x = np.arange(len(model_names))
+	width = 0.32  # narrower bars -> less visual weight + more room for labels
+
+	fig, ax = plt.subplots(figsize=(6.4, 3.4))
+
+	# Typography
+	ax.set_ylabel("Mean bias sensitivity (rate)", fontsize=15)
+	ax.tick_params(axis="both", labelsize=13)
+
+	bars_base = ax.bar(x - width / 2, base_means, width, label="Ø", color="steelblue")
+	bars_ours = ax.bar(x + width / 2, ours_means, width, label="sAX+BW", color="darkorange")
+
+	ax.errorbar(
+		x - width / 2,
+		base_means,
+		yerr=[base_err_low, base_err_high],
+		fmt="none",
+		capsize=3,
+		color="black",
+		linewidth=1,
+		zorder=3,
+	)
+	ax.errorbar(
+		x + width / 2,
+		ours_means,
+		yerr=[ours_err_low, ours_err_high],
+		fmt="none",
+		capsize=3,
+		color="black",
+		linewidth=1,
+		zorder=3,
+	)
+
+	ax.set_xticks(x)
+	ax.set_xticklabels(model_names, fontsize=13)
+	ax.set_ylim(0, 1)
+
+	ax.grid(axis="y", linestyle=":", linewidth=0.8, alpha=0.6)
+	ax.set_axisbelow(True)
+	ax.legend(frameon=False, ncol=2, fontsize=12, loc="upper right")
+
+	# Value labels
+	def _annotate(bars):
+		for b in bars:
+			h = float(b.get_height())
+			y = min(h + 0.02, 0.98)  # keep text inside axes
+			ax.text(
+				b.get_x() + b.get_width() / 1.9,
+				y,
+				f"{h:.2f}",
+				ha="center",
+				va="bottom",
+				fontsize=12,
+			)
+
+	_annotate(bars_base)
+	_annotate(bars_ours)
+
+	fig.tight_layout()
+	fig.savefig(out_path, bbox_inches="tight", pad_inches=0.02)
+	plt.close(fig)
 def plot_change_hist(df: pd.DataFrame, model_name: str, out_path: Path):
 	"""Histogram (as a 3-bin bar chart) of per-dilemma change (OURS - BASE in {-1,0,+1})."""
 	base = df["Sensitivity_BASE"].to_numpy()
@@ -261,9 +316,9 @@ def format_summary_for_csv(summary_rows):
 
 def main():
 	parser = argparse.ArgumentParser(description="Bias Sensitivity Analysis (Open-Ended Dilemmas)")
-	parser.add_argument("--gpt_csv", type=Path, default=Path("manually_analyzed_data/extracted_gpt4o_checked.csv"))
-	parser.add_argument("--llama_csv", type=Path, default=Path("manually_analyzed_data/extracted_llama_checked.csv"))
-	parser.add_argument("--out_dir", type=Path, default=Path("data_visualization"))
+	parser.add_argument("--gpt_csv", type=Path, default=Path("open_ended_dilemma_qualitative_analysis/manually_analyzed_data/resolved_conflict/extracted_gpt4o_checked.csv"))
+	parser.add_argument("--llama_csv", type=Path, default=Path("open_ended_dilemma_qualitative_analysis/manually_analyzed_data/resolved_conflict/extracted_llama_checked.csv"))
+	parser.add_argument("--out_dir", type=Path, default=Path("open_ended_dilemma_qualitative_analysis/data_visualization"))
 	args = parser.parse_args()
 
 	args.out_dir.mkdir(parents=True, exist_ok=True)
@@ -296,7 +351,7 @@ def main():
 		print(f"\nModel: {s['model']}  (n={s['n_dilemmas']})")
 		print(f"  Mean sensitivity BASE → OURS: {s['mean_sensitivity_BASE']:.3f} → {s['mean_sensitivity_OURS']:.3f}")
 		print(f"  Absolute reduction (pp): {s['abs_reduction_pp']:.1f}  "
-			  f"[95% CI: {s['95% CI abs reduction (pp)'][0]:.1f}, {s['95% CI abs reduction (pp)'][1]:.1f}]")
+				f"[95% CI: {s['95% CI abs reduction (pp)'][0]:.1f}, {s['95% CI abs reduction (pp)'][1]:.1f}]")
 		rr = s['rel_reduction_%']
 		print(f"  Relative reduction: {rr:.1f}%") if not math.isnan(rr) else print("  Relative reduction: NA")
 		print(f"  Improvements (1→0): {s['BASE->OURS improvements (1->0)']}  |  Regressions (0→1): {s['BASE->OURS regressions (0->1)']}")

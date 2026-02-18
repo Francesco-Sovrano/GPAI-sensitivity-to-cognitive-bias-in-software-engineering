@@ -3,6 +3,8 @@
 This repository is the **replication package** for the paper *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering*. It contains the datasets, experiment scripts, and plotting utilities needed to reproduce the results reported in the paper.
 
 > **Dataset provenance.** The dilemmas and axiomatic backgrounds used here come from the **PROBE‑SWE** benchmark (dynamic SE dilemmas with biased/unbiased paired prompts). A dump is included under `./dataset/`.
+>
+> The **DevGPT** post‑hoc analysis additionally relies on the external DevGPT dataset (not redistributed here); see the DevGPT section below for download instructions.
 
 ---
 
@@ -18,6 +20,9 @@ This repository is the **replication package** for the paper *Mitigating Prompt�
 - `requirements.txt` — Python dependencies.
 - `run_all_experiments.sh` — example batch runner (you may tailor it to your keys/models/settings).
 - `LICENSE` — MIT.
+- `devgpt_bias_features_analysis/` — post‑hoc audit of bias‑inducing *linguistic cues* in real‑world coding prompts from DevGPT (scripts + manual codebook + corrected labels; requires external DevGPT download).
+- `thematic_coding_of_gpai_systems_behaviours/` — RQ3 lexicon/codebook + analysis script for thematic coding of GPAI behaviours; includes precomputed outputs under `bias_se_analysis/`.
+- `open_ended_dilemma_qualitative_analysis/` — scripts and **manually_analyzed_data/** for the open‑ended dilemma qualitative analysis and associated figures.
 
 ---
 
@@ -201,6 +206,89 @@ API usage incurs cost; consider lowering `--n_independent_runs_per_task` or runn
 
 ---
 
+## Additional Artifacts and Analyses
+
+### Post-hoc validation on real-world prompts (DevGPT)
+
+The directory `devgpt_bias_features_analysis/` contains the scripts and **manual correction artifacts** used in the paper’s post-hoc validation on DevGPT (real-world developer–ChatGPT conversations).
+
+**What’s in the folder**
+- `analyze_bias_features_devgpt.py` — end-to-end pipeline (triage → coding-only filter → cue-type assignment → prevalence tables).
+- `classify_devgpt_with_groq.py` — helper script to (re-)run the *coding-related* triage and cue classification with an OpenAI-compatible API.
+- `DevGPT_manual_cue_codebook.md` — **manual cue codebook** (inclusion/exclusion criteria, label set, decision rules).
+- `manually_corrected_entries.csv` — manually audited subset (final label column: `bias_cue_type_llm_corrected`).
+
+#### DevGPT data dependency (download)
+DevGPT is not redistributed in this replication package. Download `DevGPT.zip` from Zenodo (Version v9 used in the paper):
+
+- https://zenodo.org/records/10086809  (DOI: 10.5281/zenodo.10086809)
+
+You can keep the dataset **as a zip**; the pipeline accepts either a `.zip` file or an extracted directory.
+
+#### Run (example)
+```bash
+python devgpt_bias_features_analysis/analyze_bias_features_devgpt.py \
+  --probe ./dataset \
+  --devgpt /path/to/DevGPT.zip \
+  --out_dir devgpt_bias_features_analysis/out
+```
+
+Notes:
+- The default `--ai_method hf_clf` fine-tunes a DeBERTa classifier and may benefit from a GPU (`--device cuda`).  
+- First run may download HF models; cache locations can be customized via `HF_PRED_CACHE_DIR` / `SBERT_EMB_CACHE_DIR` (see script header).
+
+---
+
+### RQ3 thematic coding of GPAI system behaviours (lexicon-based)
+
+The directory `thematic_coding_of_gpai_systems_behaviours/` contains:
+- `codebook.md` — the **lexicon/codebook** (feature groups and matching rules).
+- `thematic_analysis.py` — analysis script that counts lexicon features in model explanations and tests for differences.
+- `bias_se_analysis/` — **precomputed** outputs (CSVs + PDFs) included for convenience.
+
+#### Re-run from your own experiment outputs
+1) Run `1_compute_bias_sensitivity.py` (baseline and/or mitigated strategies) to generate CSVs in `generated_output_data/`:
+- `generated_output_data/1_llm_outputs_*.csv`
+
+2) Zip one or more of those CSVs into `to_analyze.zip`:
+```bash
+cd generated_output_data
+zip to_analyze.zip 1_llm_outputs_*.csv
+cd ..
+```
+
+3) Run the thematic analysis:
+```bash
+python thematic_coding_of_gpai_systems_behaviours/thematic_analysis.py \
+  --zip generated_output_data/to_analyze.zip \
+  --output_path thematic_coding_of_gpai_systems_behaviours/bias_se_analysis
+```
+
+The input CSVs must contain (at least) these columns:
+`bias_name`, `prompt_with_bias`, `decision_explanation_with_bias`, `sensitive_to_bias`.
+
+---
+
+### Open-ended dilemma qualitative analysis (manual coding)
+
+The directory `open_ended_dilemma_qualitative_analysis/` contains the scripts and the **manually_analyzed_data/** used for the paper’s open-ended dilemma audit.
+
+**Manual data (included)**
+- `manually_analyzed_data/p1/` and `manually_analyzed_data/p2/` — two independent coding passes.
+- `manually_analyzed_data/resolved_conflict/` — final resolved labels (used for plotting/stats).
+- `manually_analyzed_data/combined_agreement_stats.csv`, `paper_stats.csv` — supporting stats/materials.
+
+**Reproduce the summary figures**
+```bash
+cd open_ended_dilemma_qualitative_analysis
+pip install -r requirements.txt
+python visualize_results.py \
+  --gpt_csv  manually_analyzed_data/resolved_conflict/extracted_gpt4o_checked.csv \
+  --llama_csv manually_analyzed_data/resolved_conflict/extracted_llama_checked.csv \
+  --out_dir data_visualization
+```
+
+The `data_merger.py` helper shows how the *candidates to manually audit* were derived from the CSV outputs of `1_compute_bias_sensitivity.py` (by intersecting cases where the baseline is sensitive and the mitigated setting is not).
 ## License
 
 This project is released under the **MIT License** (see `LICENSE`).

@@ -9,3 +9,7 @@ seaborn
 statsmodels
 scikit-learn
 Levenshtein
+
+protobuf>=3.20.3,<5
+sentencepiece
+transformers[torch]

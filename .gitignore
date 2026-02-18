@@ -4,7 +4,13 @@
 cache/*
 extra/*
 logs/*
-*.csv
+_*
+
+devgpt_labeled.csv
+devgpt_prompts.csv
+probe_cue_docs.csv
+generated_output_data/1_llm_outputs_model=*
+open_ended_dilemma_qualitative_analysis/data_to_analyze/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

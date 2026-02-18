@@ -1,0 +1,10 @@
+bias,strategy,sensitivity,rank_within_bias
+anchoring bias,sAX+BW,3.4589041095890414,1.0
+anchoring bias,sAX+BW+IsD,3.4589041095890414,1.0
+availability bias,sAX,5.789666406902832,1.0
+bandwagon effect,sAX+BW+IsD,5.650684931506849,1.0
+confirmation bias,sAX+BW,6.035365406492982,1.0
+framing effect,sAX+BW,14.970776568676238,1.0
+hindsight bias,ProbeAX,19.178082191780824,1.0
+hyperbolic discounting,sAX+BW+IsD,6.694192685270675,1.0
+overconfidence bias,sAX+BW,3.801369863013699,1.0

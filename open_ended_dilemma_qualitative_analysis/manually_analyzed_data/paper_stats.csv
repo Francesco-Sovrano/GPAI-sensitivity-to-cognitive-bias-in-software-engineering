@@ -1,0 +1,5 @@
+dataset,label_column,n,percent_agreement,cohens_kappa,n_disagree,final_true_rate_percent,p1,p2
+llama,Sensitivity_BASE,40,82.5,0.6335078534031413,7,40.0,6,1
+llama,Sensitivity_OURS,40,77.5,0.4303797468354431,9,30.0,5,4
+gpt4o,Sensitivity_BASE,40,80.0,0.5918367346938777,8,40.0,6,2
+gpt4o,Sensitivity_OURS,40,85.0,0.6238244514106582,6,27.500000000000004,4,2

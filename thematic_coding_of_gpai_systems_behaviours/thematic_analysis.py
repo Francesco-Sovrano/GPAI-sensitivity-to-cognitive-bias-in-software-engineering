@@ -11,7 +11,6 @@ import textwrap
 from matplotlib import patheffects as pe
 from matplotlib.patches import Rectangle
 from matplotlib.lines import Line2D
-from wordcloud import WordCloud
 import statsmodels.api as sm
 from statsmodels.stats.rates import test_poisson_2indep
 
@@ -217,6 +216,96 @@ def load_data(zip_path):
 		raise ValueError("No CSV with required columns found.")
 	return pd.concat(frames, ignore_index=True).dropna(subset=["prompt_with_bias"])
 
+
+
+# --- Feature display names & grouping (used for Fig. 5: overview_heatmap) ---
+FEATURE_LABELS = {
+	"requirements_terms": "requirements",
+	"bug_failure_terms": "bugs/failures",
+	"testing_quality_terms": "testing/quality",
+	"time_pressure_deadline": "time pressure",
+	"process_governance_terms": "process/governance",
+	"estimation_uncertainty": "estimation uncertainty",
+	"performance_scalability": "performance/scalability",
+	"security_privacy_terms": "security/privacy",
+	"tooling_infra_terms": "tooling/infra",
+	"legacy_tech_debt": "legacy/tech debt",
+	"collaboration_conflict": "collaboration/conflict",
+	"refactoring_design_terms": "refactoring/design",
+	"documentation_terms": "documentation",
+	"incident_reliability": "incidents/reliability",
+	"observability_terms": "observability",
+	"data_db_terms": "data/DB",
+	"frontend_perf_accessibility": "frontend perf/accessibility",
+	"mobile_release": "mobile release",
+	"cloud_platforms": "cloud platform",
+	"pm_process_terms": "PM process",
+	"api_platform_terms": "API/platform",
+	"cost_finops": "FinOps/cost",
+	"ml_ai_terms": "ML/AI",
+	# --- General language markers ---
+	"negations": "negations",
+	"comparatives": "comparatives",
+	"superlatives": "superlatives",
+	"modals": "modals",
+	"hedges": "hedges",
+	"intensifiers": "intensifiers",
+	"emotion_words": "emotion words",
+	"risk_liability": "risk/liability",
+	"performance_judgment": "performance judgment",
+}
+
+FEATURE_GROUPS = {
+	# --- Lexicon feature groups (edit names/order to match the paper text) ---
+	"Process & planning": [
+		"requirements_terms",
+		"pm_process_terms",
+		"process_governance_terms",
+		"estimation_uncertainty",
+		"time_pressure_deadline",
+	],
+	"Quality & reliability": [
+		"bug_failure_terms",
+		"testing_quality_terms",
+		"incident_reliability",
+		"observability_terms",
+		"performance_scalability",
+		"security_privacy_terms",
+	],
+	"Engineering debt & coordination": [
+		"tooling_infra_terms",
+		"legacy_tech_debt",
+		"refactoring_design_terms",
+		"documentation_terms",
+		"collaboration_conflict",
+	],
+	"Product surface": [
+		"data_db_terms",
+		"frontend_perf_accessibility",
+		"mobile_release",
+	],
+	# Example from the review comment:
+	"Platform Scope": [
+		"api_platform_terms",
+		"cloud_platforms",
+	],
+	"Emerging themes": [
+		"cost_finops",
+		"ml_ai_terms",
+	],
+	# --- Keep these at the end ---
+	"General language markers": [
+		"negations",
+		"comparatives",
+		"superlatives",
+		"modals",
+		"hedges",
+		"intensifiers",
+		"emotion_words",
+		"risk_liability",
+		"performance_judgment",
+	],
+}
 
 def compile_lexicon(lex=None):
 	lex = SE_LEXICON if lex is None else lex
@@ -441,15 +530,23 @@ def plot_overview_heatmap(
 	max_xticklabels=36,           # max number of x labels to show
 	star_levels=(0.001, 0.01, 0.05),  # thresholds for ***, **, *
 	annotate_values=False,        # keep False to reduce clutter
-	# --- NEW ---
 	rowwise_top_k=3,                          # how many to highlight per row
 	rowwise_metric="effect",              # "abs_effect" | "effect" | "display"
 	rowwise_require_significant=True,        # restrict to significant cells?
-	rowwise_box_kw=None                       # dict for Rectangle styling
+	rowwise_box_kw=None,                      # dict for Rectangle styling
+	feature_groups=None,                        # dict: group -> [feature keys]
+	feature_labels=None,                        # dict: feature key -> display label
+	group_labels_on_top=True,                   # draw group titles on a top x-axis
+	group_shading=True,                         # lightly shade alternating groups
+	respect_cluster_order=True                  # keep within-group clustering order
 ):
 
 	def _wrap_labels(labels, width=32):
-		return [textwrap.fill(str(lbl).replace("_", " ").replace(" ", "\n"), width=width) for lbl in labels]
+		out = []
+		for lbl in labels:
+			s = str(lbl).replace("_", " ")
+			out.append(textwrap.fill(s, width=width))
+		return out
 
 	def _auto_fontsizes(nrows, ncols):
 		xfs = 10 if ncols <= 22 else 9 if ncols <= 34 else 8 if ncols <= 48 else 7
@@ -497,6 +594,42 @@ def plot_overview_heatmap(
 	if pf is not None:
 		pf = pf[head + tail_present]
 
+	# Optional: enforce manuscript-style feature grouping/order + nicer labels
+	# (edit FEATURE_GROUPS / FEATURE_LABELS above to match the text)
+	if feature_groups is None:
+		feature_groups = FEATURE_GROUPS if "FEATURE_GROUPS" in globals() else None
+	if feature_labels is None:
+		feature_labels = FEATURE_LABELS if "FEATURE_LABELS" in globals() else {}
+
+	group_ranges = []
+	if feature_groups:
+		base_order = list(piv.columns)
+		pos = {c:i for i,c in enumerate(base_order)}
+		ordered = []
+		for gname, feats in feature_groups.items():
+			feats_present = [f for f in feats if f in base_order]
+			if not feats_present:
+				continue
+			if respect_cluster_order and cluster_cols:
+				feats_present = sorted(feats_present, key=lambda c: pos.get(c, 10**9))
+			start = len(ordered)
+			ordered.extend(feats_present)
+			end = len(ordered) - 1
+			group_ranges.append((gname, start, end))
+		leftovers = [c for c in base_order if c not in ordered]
+		if leftovers:
+			start = len(ordered)
+			ordered.extend(leftovers)
+			end = len(ordered) - 1
+			group_ranges.append(("Other", start, end))
+
+		piv = piv[ordered]
+		sig = sig[ordered]
+		if pf is not None:
+			pf = pf[ordered]
+	else:
+		group_ranges = []
+
 	data = piv.values
 	if data.size == 0:
 		return
@@ -528,7 +661,10 @@ def plot_overview_heatmap(
 
 	ax.set_xticks(np.arange(ncols))
 	show = set(np.linspace(0, ncols - 1, num=min(ncols, max_xticklabels), dtype=int).tolist())
-	xlabels_full = _wrap_labels(piv.columns, width=13)
+	def _col_label(c):
+		return feature_labels.get(c, str(c).replace('_',' ')) if feature_labels is not None else str(c).replace('_',' ')
+	
+	xlabels_full = _wrap_labels([_col_label(c) for c in piv.columns], width=13)
 	xlabels = [lbl if j in show else "" for j, lbl in enumerate(xlabels_full)]
 	ax.set_xticklabels(xlabels, rotation=90, ha="center", fontsize=xfs)
 
@@ -538,11 +674,38 @@ def plot_overview_heatmap(
 	ax.grid(which="minor", color="k", linestyle="-", linewidth=0.3, alpha=0.12)
 	ax.tick_params(which="minor", bottom=False, left=False)
 
-	# Visual separator for tail group
-	if len(tail_present) > 0 and len(head) > 0:
-		split_at = len(head) - 0.5
+	# Visual separator for the general-marker tail (robust to reordering)
+	_tail_pos = [j for j, c in enumerate(piv.columns) if c in tail_present]
+	if _tail_pos:
+		split_at = min(_tail_pos) - 0.5
 		ax.axvline(split_at, color="k", lw=2.0, alpha=0.25)
 		ax.axvspan(split_at, ncols - 0.5, color="k", alpha=0.04)
+
+
+
+	# Group boundaries + group titles (if FEATURE_GROUPS / feature_groups provided)
+	if group_ranges:
+		# Alternating background shading per group
+		if group_shading:
+			for gi, (_, s, e) in enumerate(group_ranges):
+				if gi % 2 == 1:
+					ax.axvspan(s - 0.5, e + 0.5, color="k", alpha=0.03, zorder=0)
+
+		# Vertical separators between groups
+		for (_, _, e) in group_ranges[:-1]:
+			ax.axvline(e + 0.5, color="k", lw=1.4, alpha=1.0)
+
+		# Group labels on a top x-axis
+		if group_labels_on_top:
+			ax_top = ax.twiny()
+			ax_top.set_xlim(ax.get_xlim())
+			centers = [(s + e) / 2 for (_, s, e) in group_ranges]
+			labels = [textwrap.fill(g, width=12) for (g, _, _) in group_ranges]
+			ax_top.set_xticks(centers)
+			ax_top.set_xticklabels(labels, fontsize=max(8, xfs), rotation=0)
+			ax_top.tick_params(axis="x", which="both", length=0, pad=2)
+			for spine in ax_top.spines.values():
+				spine.set_visible(False)
 
 	# Title + colorbar
 	# ax.set_title("SE feature impact on bias sensitivity (log rate ratio)", fontsize=tfs)
@@ -636,7 +799,7 @@ def plot_overview_heatmap(
 		ax.legend(
 			handles=legend_handles,
 			loc="upper left",
-			bbox_to_anchor=(.88, 1.1),
+			bbox_to_anchor=(.92, 1.1),
 			borderaxespad=0,
 			frameon=True,
 			fontsize=max(8, xfs-1)
@@ -646,7 +809,7 @@ def plot_overview_heatmap(
 	for spine in ax.spines.values():
 		spine.set_visible(False)
 
-	plt.tight_layout()
+	# plt.tight_layout()
 	fig.savefig(out, dpi=240, bbox_inches="tight")
 	plt.close(fig)
 
@@ -807,29 +970,6 @@ def compute_word_effects(df, min_tokens=10, method="auto", top_n=50):
 	return pd.DataFrame(rows)
 
 
-
-def plot_wordclouds_tokens(res_words, out_dir, top_n=50):
-	from wordcloud import WordCloud
-	for bias, g in res_words.groupby("bias_name"):
-		if g.empty:
-			continue
-		g["abs_effect"] = g["effect"].abs()
-		top = g.sort_values("abs_effect", ascending=False).head(top_n)
-
-		freqs = dict(zip(top["word"], top["abs_effect"]))
-
-		wc = WordCloud(
-			width=1000, height=600,
-			background_color="white",
-			colormap="RdBu_r",
-		).generate_from_frequencies(freqs)
-
-		out = out_dir / f"wordcloud_words_{bias.replace(' ', '_')}.pdf"
-		wc.to_file(out)
-		print(f"Saved token-level wordcloud: {out}")
-
-
-
 if __name__ == "__main__":
 	p = argparse.ArgumentParser()
 	p.add_argument("--zip", type=Path, required=True, help="Path to to_analyze.zip")
@@ -839,13 +979,14 @@ if __name__ == "__main__":
 		default="auto",
 		help="Effect metric: 'auto' = tiny-count exact/score + per-prompt Poisson GLM (robust/quasi); 'poisson' = aggregated Wald LRR; 'glm' = GLM+offset; 'logit' = smoothed log-odds"
 	)
-	p.add_argument("--top-n", type=int, default=12)
+	p.add_argument("--top_n", type=int, default=12)
+	p.add_argument("--output_path", type=str, default="bias_se_analysis")
 	args = p.parse_args()
 
 	zip_path=args.zip
 	max_per_group=None
 	
-	out_dir = Path("bias_se_analysis")
+	out_dir = Path(args.output_path)
 	out_dir.mkdir(exist_ok=True)
 
 	df = load_data(zip_path)
@@ -863,10 +1004,6 @@ if __name__ == "__main__":
 	res = compute_effects(df, method=args.method)
 	csv_path = out_dir / "se_feature_differences_by_bias.csv"
 	res.to_csv(csv_path, index=False)
-
-	# res_words = compute_word_effects(df, method=args.method)
-	# if not res_words.empty:
-	# 	plot_wordclouds_tokens(res_words, out_dir, top_n=args.top_n)
 
 
 	top = (res[res["significant"]]

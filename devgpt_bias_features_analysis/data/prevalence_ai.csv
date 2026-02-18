@@ -1,0 +1,10 @@
+ai_bias_type,n_prompts,mapped_count,mapped_pct,threshold,ai_method,ai_model
+anchoring bias,35784,200,0.558909009613235,0.6,hf_clf,microsoft/deberta-v3-base
+availability bias,35784,1609,4.496422982338475,0.6,hf_clf,microsoft/deberta-v3-base
+bandwagon effect,35784,5,0.013972725240330873,0.6,hf_clf,microsoft/deberta-v3-base
+confirmation bias,35784,487,1.360943438408227,0.6,hf_clf,microsoft/deberta-v3-base
+framing effect,35784,4662,13.028169014084508,0.6,hf_clf,microsoft/deberta-v3-base
+hindsight bias,35784,851,2.378157835904315,0.6,hf_clf,microsoft/deberta-v3-base
+hyperbolic discounting,35784,735,2.0539906103286385,0.6,hf_clf,microsoft/deberta-v3-base
+overconfidence bias,35784,1071,2.992957746478873,0.6,hf_clf,microsoft/deberta-v3-base
+ANY_AI_CUE,35784,9620,26.883523362396602,0.6,hf_clf,microsoft/deberta-v3-base

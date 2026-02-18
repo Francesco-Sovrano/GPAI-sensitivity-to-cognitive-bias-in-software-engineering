@@ -1,0 +1,3 @@
+label_column,n_total,percent_agreement,cohens_kappa
+Sensitivity_BASE,80,81.25,0.61139896373057
+Sensitivity_OURS,80,81.25,0.5253164556962026

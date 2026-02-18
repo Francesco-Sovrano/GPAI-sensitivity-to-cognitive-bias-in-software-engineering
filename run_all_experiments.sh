@@ -144,3 +144,24 @@ python3 2_visualize_bias_sensitivity.py --self_axioms_elicitation --bistep_axiom
 python3 2_visualize_bias_sensitivity.py --impersonified_self_debiasing --bias_warning
 
 python3 3_analyze_strategy_effectiveness.py --show_figures
+
+python3 open_ended_dilemma_qualitative_analysis/visualize_results.py
+
+python3 thematic_coding_of_gpai_systems_behaviours/thematic_analysis.py \
+	--zip thematic_coding_of_gpai_systems_behaviours/to_analyze.zip \
+	--output_path thematic_coding_of_gpai_systems_behaviours/bias_se_analysis
+
+python3 devgpt_bias_features_analysis/analyze_bias_features_devgpt.py \
+  --probe "dataset" \
+  --devgpt "DevGPT.zip" \
+  --out_dir "devgpt_bias_features_analysis/data" \
+  --subset all \
+  --ai_threshold 0.6 \
+  --ai_method hf_clf \
+  --hf_model microsoft/deberta-v3-base \
+  --hf_fp16 
+
+python3 devgpt_bias_features_analysis/classify_devgpt_with_groq.py \
+	--input devgpt_bias_features_analysis/data/manual_evaluation_with_predictions.csv \
+	--output devgpt_bias_features_analysis/corrected_prompts_classification_with_qwen3.csv \
+	--threshold 0.75

@@ -1,0 +1,3 @@
+model,n_dilemmas,mean_sensitivity_BASE,mean_sensitivity_OURS,abs_reduction_pp,rel_reduction_%,BASE->OURS improvements (1->0),BASE->OURS regressions (0->1),both not sensitive (0->0),both sensitive (1->1),McNemar p (continuity-corrected),Cohen's h (BASE vs OURS),95% CI BASE low,95% CI BASE high,95% CI OURS low,95% CI OURS high,95% CI abs reduction (pp) low,95% CI abs reduction (pp) high
+gpt-4o-mini,40,0.4,0.275,12.5,31.25,12,7,17,4,0.3587953578869416,0.26540741825696545,0.25,0.55,0.15,0.425,-9.999999999999998,35.0
+llama-3.1-8b,40,0.4,0.3,10.000000000000004,25.000000000000007,8,4,20,8,0.38647623077123283,0.2101589252771574,0.25,0.55,0.175,0.45,-7.499999999999996,27.499999999999996

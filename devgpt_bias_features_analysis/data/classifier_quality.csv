@@ -1,0 +1,2 @@
+eval_mode,eval_test_size,eval_seed,n_samples,n_classes,accuracy,precision_macro,recall_macro,f1_macro,precision_weighted,recall_weighted,f1_weighted,model_source,note,eval_threshold,coverage,accuracy_on_covered
+holdout,0.2,1337,8091,8,0.8350833848054354,0.8411644898389615,0.8269987947321217,0.8330467158512287,0.8381296200784863,0.8350833848054354,0.8357948536714416,reuse,,0.6,0.9234095120444719,0.8702341137123746
