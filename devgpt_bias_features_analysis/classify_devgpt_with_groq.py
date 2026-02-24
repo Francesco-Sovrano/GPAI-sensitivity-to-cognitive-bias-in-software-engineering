@@ -89,15 +89,15 @@ Output format MUST be exactly:
 """
 
 BIAS_CUE_LABELS = {
-    1: "Framing effect",
-    2: "Overconfidence bias",
-    3: "Bandwagon effect",
-    4: "Confirmation bias",
-    5: "Anchoring bias",
-    6: "Availability bias",
-    7: "Hyperbolic discounting",
-    8: "Hindsight bias",
-    9: "No bias cue present",
+	1: "Framing effect",
+	2: "Overconfidence bias",
+	3: "Bandwagon effect",
+	4: "Confirmation bias",
+	5: "Anchoring bias",
+	6: "Availability bias",
+	7: "Hyperbolic discounting",
+	8: "Hindsight bias",
+	9: "No bias cue present",
 }
 
 def parse_explanation_and_label_1to9(text: str) -> Tuple[str, Optional[int]]:

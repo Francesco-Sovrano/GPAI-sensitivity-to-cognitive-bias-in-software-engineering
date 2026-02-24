@@ -165,3 +165,11 @@ python3 devgpt_bias_features_analysis/classify_devgpt_with_groq.py \
 	--input devgpt_bias_features_analysis/data/manual_evaluation_with_predictions.csv \
 	--output devgpt_bias_features_analysis/corrected_prompts_classification_with_qwen3.csv \
 	--threshold 0.75
+
+python3 devgpt_bias_features_analysis/compute_cue_alignment.py \
+  --dev_csv "devgpt_bias_features_analysis/DevGPT positive entries.csv" \
+  --probe_path "dataset" \
+  --bias_col "bias_cue_type_llm_corrected" \
+  --threshold 0.85 \
+  --topk 25 \
+  --out_dir "devgpt_bias_features_analysis/out_alignment"

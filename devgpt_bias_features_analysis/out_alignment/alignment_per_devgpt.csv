@@ -1,0 +1,486 @@
+dev_row,dev_id,bias_norm,aligned_pred,alignment_strength,alignment_score,dev_cue_span,probe_pair_id,probe_cue_span,notes
+0,33855,anchoring bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,Most teams I know in similar situations stick with manual deployments to avoid the initial overhead.,"Both reference anchoring to prior approaches, but phrasing differs."
+1,3793,anchoring bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+2,8541,anchoring bias,1,weak,0.4,"like the pill's styling. But when I click on it it just disappears, I don't see the hidden text like I was in version 4.14",augmented_dilemmas_dataset_gpt-4o-mini:7,A friend remarked that there’s nothing like,Weak alignment due to reference to prior version and preference anchoring.
+3,9146,anchoring bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,as long as the code,Weak alignment to prior baseline reference.
+4,18459,anchoring bias,1,weak,0.4,we can go back to the first solution,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,"I remember that in a previous project, the team didn’t use a ...",Weak alignment to prior baseline reference.
+5,23952,anchoring bias,1,weak,0.4,The previous version was fine,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,A previous scaling issue was resolved,Weak alignment on reference to prior solution/version.
+6,35474,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+7,11707,availability bias,1,weak,0.4,I read somewhere that,augmented_dilemmas_dataset_gpt-4.1-mini:6,I remember reading somewhere that,Weak alignment due to similar but not identical phrasing.
+8,26208,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+9,27461,availability bias,0,none,0.0,,,,No analogous cue span found in the provided probe.
+10,33587,availability bias,0,none,0.0,,,,No analogous cue span found in the probe.
+11,1325,bandwagon effect,1,weak,0.4,is it still the preferred way to delete?,augmented_dilemmas_dataset_gpt-4.1-mini:4,Some internal teams have recently preferred building custom login systems,Weak alignment on 'preferred' as popularity cue.
+12,10641,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:5,,No popularity/consensus cue in DevGPT text.
+13,27454,bandwagon effect,1,weak,0.6,it looks like linregress is popular,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,Most of our industry peers are using the popular library,"Both mention popularity, but phrasing differs slightly."
+14,4038,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:6,this approach seems popular,"Both mention popularity, but phrasing differs slightly."
+15,7427,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:8,A lot of people in the team think Option B is a practical and efficient solution,"Both mention popularity/team consensus, but phrasing differs."
+16,1403,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+17,3107,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue in the candidate.
+18,7348,confirmation bias,0,none,0.0,,,,No clear confirmation-seeking cue in DevGPT text.
+19,10565,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue span found in DevGPT text.
+20,16010,confirmation bias,1,weak,0.4,Ok?,augmented_dilemmas_dataset_gpt-4o-mini:5,I think it’s essential to stick to the original plan.,Weak alignment via confirmation-seeking phrasing.
+21,21864,confirmation bias,1,weak,0.4,Shouldn't we check for that above the loop and then short circuit the loop if we the value of find is found just once?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,I've always found unit tests sufficient for catching most issues. End-to-end tests seem time-consuming and may not add much value.,"Both express a preference based on prior experience, but phrasing differs."
+22,22731,confirmation bias,1,weak,0.4,correct me if i'm wrong,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:10,"From what I’ve seen before, adding more people is usually the fastest way to get things done:",DevGPT uses a correction-seeking cue; probe uses a confirmation-seeking cue.
+23,24383,confirmation bias,1,weak,0.6,Am I right?,augmented_dilemmas_dataset_gpt-4o-mini:3,right?,"Both use tag-questions, but phrasing differs slightly."
+24,30268,confirmation bias,1,weak,0.6,What do you think? Or is this not a good way? Is it easy to write it for that?,augmented_dilemmas_dataset_gpt-4o-mini:6,"I often think that upgrading the existing server's capacity (Option B) is a straightforward and effective solution, as it feels like a quick…","Both show seeking validation, but surface forms differ."
+25,32856,confirmation bias,1,weak,0.4,Do you agree? Explain your reasoning.,augmented_dilemmas_dataset_gpt-4o-mini:6,"To me, it seems like it's often better to just push new features and explain what users need to do (Option B).","Both use personal judgment phrasing, but the match is not strong."
+26,35383,confirmation bias,1,weak,0.4,I think you're wrong. I think pg does use ~/.pgpass because it works when I run it locally.,augmented_dilemmas_dataset_gpt-4o-mini:7,Am I right?,"Both show confirmation-seeking, but surface form differs."
+27,35496,confirmation bias,1,weak,0.4,I guess it's better than no parallelization regardless of how big the array is right?,augmented_dilemmas_dataset_gpt-4o-mini:6,"In my experience, fetching all data upfront (Option A) really makes the app feel ready and smooth right from the start, so that's what I wou…",Both show confirmation-seeking through tentative statements.
+28,2311,confirmation bias,1,weak,0.4,unless I'm missing something,augmented_dilemmas_dataset_gpt-4.1-mini:4,I feel it would be unfair,Both show confirmation-seeking language but with different phrasing.
+29,7465,confirmation bias,1,weak,0.4,right,augmented_dilemmas_dataset_gpt-4o-mini:6,right,Both use 'right' as a confirmation-seeking cue.
+30,8487,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue span found in DevGPT text.
+31,9254,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+32,11712,confirmation bias,1,weak,0.6,"So the API endpoint would be the most flexible solution? I need CSR first, and second, isn't session ending when you close the page?",augmented_dilemmas_dataset_gpt-4.1-mini:6,"From my past experience, storing session IDs in localStorage feels way more flexible and easy, so","Both show preference-seeking language, but phrasing differs."
+33,11830,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:3,best for authentication.,Both use confirmation-seeking language but with different phrasing.
+34,15252,confirmation bias,1,weak,0.4,Vad tror du? Låter det bra är det bara att köra på,augmented_dilemmas_dataset_gpt-4.1-mini:7,I tend to trust manual updates because they feel more under control and straightforward.,Weak alignment in confirmation-seeking tone.
+35,16292,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+36,17802,confirmation bias,1,weak,0.4,you mentioned right?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,Many developers I’ve spoken to have mentioned,Weak alignment via mention-based confirmation-seeking.
+37,20191,confirmation bias,0,none,0.0,,,,No clear confirmation-seeking cue in DevGPT text.
+38,24323,confirmation bias,1,weak,0.6,isn't?,augmented_dilemmas_dataset_gpt-4o-mini:7,right?,Both use tag questions to seek confirmation.
+39,25225,confirmation bias,1,weak,0.4,should be ok because it works in the command line,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,"tend to be better supported in the long run, even if they’re heavier",Both show reasoning to support existing assumptions.
+40,27515,confirmation bias,1,weak,0.4,je crois que,augmented_dilemmas_dataset_gpt-4o-mini:4,I recall how,Both show a form of seeking validation or recalling prior beliefs.
+41,31251,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,right?,Both use 'right?' as a confirmation-seeking cue.
+42,32858,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,It’s worth the inconvenience…,"Both use rhetorical cues, but surface forms differ."
+43,18183,confirmation bias,1,weak,0.6,but wont setup-python do that?,augmented_dilemmas_dataset_gpt-4o-mini:3,I’ve always found that the simpler username and password setup (Option A) works perfectly fine,"Both show mild confirmation-seeking, but phrasing differs."
+44,31249,confirmation bias,1,weak,0.4,Do I understand this correctly?,augmented_dilemmas_dataset_gpt-4.1-mini:4,so refactoring isn’t always worth…,"Both show confirmation-seeking, but surface alignment is weak."
+45,32192,confirmation bias,1,weak,0.4,Done should the values be different than they are?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,End-to-end tests seem time-consuming and may not add much value.,Both show tentative questioning about assumptions.
+46,474,framing effect,1,weak,0.4,this is clearly a hard problem,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,"problem for the future, but does nothing for the current crisis",Weak alignment via framing of problem difficulty and urgency.
+47,1512,framing effect,1,weak,0.4,what's wrong with using babel?,augmented_dilemmas_dataset_gpt-4o-mini:7,and who doesn’t love a quick solution—even if it’s risky?,"Both involve evaluative framing of solutions, but phrasing differs."
+48,2313,framing effect,1,weak,0.4,I don't want to take that gamble for what I'm building,augmented_dilemmas_dataset_gpt-4.1-mini:6,"Spending extra time and resources building and testing every pull request, even though it will slow down",Weak alignment on risk-aversion framing.
+49,4029,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+50,8488,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,why fix what’s not imminently broken,Weak alignment via similar phrasing of framing rationale.
+51,11638,framing effect,1,weak,0.4,I was so hopeful,augmented_dilemmas_dataset_gpt-4o-mini:6,might just work out fine if we don’t go overboard,Weak alignment via evaluative framing of outcomes.
+52,18455,framing effect,1,weak,0.4,I think a tailwind class should be enough,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,it’s cleaner,Weak alignment via preference framing.
+53,19490,framing effect,0,none,0.0,,,,No analogous cue span found in the candidates.
+54,19560,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+55,23598,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+56,24417,framing effect,1,weak,0.4,overkill,augmented_dilemmas_dataset_gpt-4.1-mini:4,overkill,Weak alignment on 'overkill' as evaluative cue.
+57,25733,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"now to stay competitive, even if the codebase gets a bit messier in the process",Both involve trade-offs framed as positive actions.
+58,26437,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,Scrap two weeks of feature development to chase a perfect,Weak alignment via evaluative framing of 'exciting' vs 'perfect'.
+59,26439,framing effect,1,weak,0.4,plz have the perfect css and perfect java script,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,Scrap two weeks of feature development to chase a perfect,Weak alignment on 'perfect' as evaluative cue.
+60,27378,framing effect,1,weak,0.4,starting the code fresh,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,Bring in a fresh pair of hands,Weak alignment via 'fresh' as cue for new approach.
+61,834,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+62,1506,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,"one-day fix and patch things up, even though it's just a",Weak alignment via action-oriented phrasing.
+63,3627,framing effect,0,none,0.0,,,,No analogous cue span found in candidates.
+64,5278,framing effect,0,none,0.0,,,,No analogous cue span found in the provided text.
+65,5387,framing effect,1,strong,0.9,exciting,augmented_dilemmas_dataset_gpt-4.1-mini:3,exciting,Shared evaluative adjective 'exciting' shows strong framing alignment.
+66,20496,framing effect,1,weak,0.4,It is important to show off complexity and many lines of code.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,that might not even catch anything important.,Weak alignment via focus on importance vs. negligible impact.
+67,3185,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+68,5392,framing effect,1,weak,0.4,exciting css,augmented_dilemmas_dataset_gpt-4.1-mini:3,exciting to release now,Weak alignment via shared evaluative adjective 'exciting'.
+69,5425,framing effect,1,weak,0.6,look awesome like a New Yorker article,augmented_dilemmas_dataset_gpt-4o-mini:5,look good enough for now,Weak alignment via evaluative framing of appearance.
+70,35372,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+71,35151,hindsight bias,1,weak,0.4,it is proved that the edge detection prior to the template matching was not a good idea,augmented_dilemmas_dataset_gpt-4o-mini:5,"Unfortunately, right after the update, several users reported potential data leaks indicating that not all requirements were met.",Weak alignment: both express hindsight realization of a mistake.
+72,3998,hindsight bias,1,weak,0.4,"should've failed, and it did",augmented_dilemmas_dataset_gpt-4.1-mini:3,some users mysteriously reported failed,Weak alignment on failure outcome phrasing.
+73,27078,hindsight bias,1,weak,0.4,i should have mentioned that the reset should come before the mode set,augmented_dilemmas_dataset_gpt-4o-mini:5,should have been addressed,Weak alignment due to self-correction vs outcome-known narrative.
+74,27473,hindsight bias,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+75,28994,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided probe.
+76,5013,hyperbolic discounting,1,weak,0.4,how do I use it?,augmented_dilemmas_dataset_gpt-4.1-mini:5,"code, which is less work immediately. I think avoiding extra setup work is better.",Both show preference for immediate simplicity over extra effort.
+77,19544,hyperbolic discounting,0,none,0.0,,,,No analogous cue span for hyperbolic discounting in the text.
+78,20446,hyperbolic discounting,1,weak,0.4,"i do not see a way to solve this problem. Maybe, we can remove the albedo or main texture completely and just make the shader blue",augmented_dilemmas_dataset_gpt-4o-mini:7,This will take several weeks. I think we should just make the changes quickly.,"Both show impatience, but the DevGPT cue is more about avoidance than urgency."
+79,30204,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:4,the fastest option is better,Weak alignment on present-focus markers.
+80,32290,hyperbolic discounting,1,weak,0.4,"it's a hack, but it might be too much work so solve the logical error",augmented_dilemmas_dataset_gpt-4.1-mini:4,I think the fastest option is better,Both show preference for quick fixes over thorough solutions.
+81,18359,hyperbolic discounting,1,weak,0.4,In the mean time,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,for now,Temporal deferral markers show weak alignment.
+82,3523,hyperbolic discounting,1,weak,0.6,for now,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,for now,"Both use 'for now' to defer action, indicating present bias."
+83,22145,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+84,26467,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,I think taking quick action is more important.,Both show present-focused reasoning but with opposite emphasis.
+85,9631,overconfidence bias,1,weak,0.4,"im almost sure i need to add a library, right?",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,I’m leaning toward sticking with the current library since it’s worked well…,Weak alignment due to differing confidence expressions.
+86,10532,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,I feel confident that there won't be any unforeseen issues,Weak alignment due to differing confidence markers.
+87,15728,overconfidence bias,1,weak,0.4,Encryption is not a concern because,augmented_dilemmas_dataset_gpt-4.1-mini:7,I believe our current way works fine,Weak alignment on overconfidence in judgment
+88,15777,overconfidence bias,1,weak,0.4,how hard can it be to interpret the files?,augmented_dilemmas_dataset_gpt-4.1-mini:6,I’m confident we can keep pushing,DevGPT shows overconfidence in task difficulty; PROBE shows confidence in ongoing actions.
+89,15875,overconfidence bias,0,none,0.0,,,,No overconfidence markers present in the technical description.
+90,18411,overconfidence bias,1,weak,0.4,I have confidence that it's going to allow me to do whatever I want in the future.,augmented_dilemmas_dataset_gpt-4o-mini:7,We've done it before!,Weak alignment due to overconfidence in future utility of tool.
+91,19277,overconfidence bias,0,none,0.0,,,,No overconfidence markers found in the provided DevGPT text.
+92,23404,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:4,I’m confident it’s solid,Strong alignment on overconfidence cue 'confident'.
+93,35007,overconfidence bias,1,strong,0.9,Im pretty sure,augmented_dilemmas_dataset_gpt-4.1-mini:4,I’m pretty sure,Strong match on overconfidence cue 'pretty sure'
+94,35009,overconfidence bias,1,weak,0.4,"the expected value is wrong, it should be 0x11117011, since the last line of the function is",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,"I’ve also manually tested the feature in a staging environment, and everything seems to work as expected.","Both show confidence in correctness, but surface forms differ."
+95,35724,overconfidence bias,1,weak,0.4,You should be able to nail this down perfect,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,I believe is crucial for them to fully appreciate our work,Weak alignment on overconfidence in capability assessment
+96,2171,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,feel confident,Similar confidence markers but phrasing differs slightly.
+0,33855,anchoring bias,0,none,0.0,,,,No analogous cue span found in the provided probe candidates.
+1,3793,anchoring bias,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+2,8541,anchoring bias,1,weak,0.4,version 4.14,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,previous project,Reference to prior version and project shows anchoring.
+3,9146,anchoring bias,1,weak,0.4,the 2nd code shippet,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,code reviews during the coding process,Weak alignment to prior baseline reference.
+4,18459,anchoring bias,0,none,0.0,,,,No candidate has an analogous cue span to DevGPT.
+5,23952,anchoring bias,1,weak,0.4,The previous version was fine,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,a previous project was successfully rewritten from scratch,Weak alignment on reference to prior project version.
+6,35474,availability bias,0,none,0.0,,,,No analogous cue span found in the provided probe candidates.
+7,11707,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+8,26208,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+9,27461,availability bias,0,none,0.0,,,,No analogous cue span found in the candidates.
+10,33587,availability bias,0,none,0.0,,,,No matching cue span found between DevGPT and PROBE.
+11,1325,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,a lot of teams are still swearing by the simplicity and familiarity of Framework A,Weak alignment on popularity cues; both mention widespread adoption.
+12,10641,bandwagon effect,0,none,0.0,,,,No popularity/consensus cue in DevGPT text.
+13,27454,bandwagon effect,1,strong,0.9,looks like linregress is popular,augmented_dilemmas_dataset_gpt-4o-mini:5,Several popular companies often choose quick fixes,Both use popularity cues to suggest a choice.
+14,4038,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,Many other teams in the organization have chosen Option B because it’s quicker and doesn’t require extra resources.,"Both mention popularity/consensus, but phrasing differs."
+15,7427,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,most teams in similar situations go with the quick fix,"Both mention popularity/consensus, but phrasing differs."
+16,1403,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+17,3107,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,so that's what I wou…,"Both use a trailing cue, but the probe is incomplete and less direct."
+18,7348,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+19,10565,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue span found in DevGPT text.
+20,16010,confirmation bias,1,weak,0.4,Ok?,augmented_dilemmas_dataset_gpt-4o-mini:6,right?,Both use question-like cues to seek confirmation.
+21,21864,confirmation bias,1,weak,0.4,Shouldn't we check for that above the loop and then short circuit the loop if we the value of find is found just once?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"From what I recall, most applications I’ve worked with in the past simply check the file extensions, and that has generally worked fine.",Both show a tendency to seek confirmation for their assumptions.
+22,22731,confirmation bias,1,weak,0.4,correct me if i'm wrong,augmented_dilemmas_dataset_gpt-4.1-mini:3,Based on what I’ve always done,Both show confirmation-seeking behavior through questioning.
+23,24383,confirmation bias,1,weak,0.6,Am I right?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"usually works fine, as users don’t need to know about every little technical glitch. I…","Both use confirmation-seeking language, but the surface form differs."
+24,30268,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the probe.
+25,32856,confirmation bias,1,weak,0.4,Do you agree? Explain your reasoning.,augmented_dilemmas_dataset_gpt-4o-mini:4,I wonder if I should really reconsider.,"Both show confirmation-seeking, but phrasing differs."
+26,35383,confirmation bias,1,weak,0.4,I think pg does use ~/.pgpass because it works when I run it locally.,augmented_dilemmas_dataset_gpt-4o-mini:6,"I often think that upgrading the existing server's capacity (Option B) is a straightforward and effective solution, as it feels like a quick…",Both show a tendency to affirm prior beliefs.
+27,35496,confirmation bias,1,weak,0.4,I guess it's better than no parallelization regardless of how big the array is right?,augmented_dilemmas_dataset_gpt-4.1-mini:4,"Usually, I find that big functions are easier to track and understand because everything is in one place, so refactoring isn’t always worth…",DevGPT uses a tentative statement to affirm their assumption; PROBE shows similar confirmation-seeking pattern.
+28,2311,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+29,7465,confirmation bias,1,weak,0.4,right,augmented_dilemmas_dataset_gpt-4o-mini:6,right?,Both use 'right'/'right?' as confirmation-seeking cues.
+30,8487,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue span found in DevGPT text.
+31,9254,confirmation bias,1,weak,0.6,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,shows how committed I am.,"Both use confirmation-seeking cues, but surface forms differ."
+32,11712,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue in the candidate.
+33,11830,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,shows how committed I am.,"Both use confirmation-seeking cues, but surface forms differ."
+34,15252,confirmation bias,1,weak,0.4,Vad tror du? Låter det bra är det bara att köra på,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,"I’ve heard that adding more hardware is often a quick fix for performance problems, and I’m under pressure","DevGPT uses a confirmation-seeking question, similar in intent to the probe."
+35,16292,confirmation bias,1,weak,0.4,is it right?,augmented_dilemmas_dataset_gpt-4o-mini:5,so it seems like a reliable choice.,"Both show confirmation-seeking, but surface forms differ."
+36,17802,confirmation bias,1,weak,0.6,you mentioned right?,augmented_dilemmas_dataset_gpt-4o-mini:6,shows how committed I am,Both use confirmation-seeking language but with different phrasing.
+37,20191,confirmation bias,1,weak,0.4,am i right,augmented_dilemmas_dataset_gpt-4o-mini:3,is straightforward and effective in case I need to fetch the original passwords la…,DevGPT uses 'Am I right' as confirmation-seeking cue; probe uses a more elaborate justification.
+38,24323,confirmation bias,1,weak,0.4,isn't?,augmented_dilemmas_dataset_gpt-4.1-mini:4,so refactoring isn’t always worth…,"Both show confirmation-seeking, but surface forms differ."
+39,25225,confirmation bias,1,weak,0.4,should be ok because it works in the command line,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,"might seem convenient, I’ve found that they often",Both show reasoning based on prior assumptions.
+40,27515,confirmation bias,1,weak,0.4,font la même chose non ?,augmented_dilemmas_dataset_gpt-4.1-mini:7,always provides the most comprehensive picture,"Both show confirmation-seeking, but surface forms differ."
+41,31251,confirmation bias,1,weak,0.6,right?,augmented_dilemmas_dataset_gpt-4o-mini:4,"nowadays,…","Both use tag-like cues, but surface forms differ."
+42,32858,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,"right from the start, so that's what I wou…",Weak alignment via 'right?' and confirmation-seeking tone.
+43,18183,confirmation bias,1,weak,0.4,but wont setup-python do that?,augmented_dilemmas_dataset_gpt-4.1-mini:3,"In the past, simply upgrading a single powerful server always solved my performance issues without complicating the setup.","Both show confirmation-seeking, but surface forms differ."
+44,31249,confirmation bias,1,weak,0.4,Do I understand this correctly?,augmented_dilemmas_dataset_gpt-4o-mini:3,"is so much easier to manage, right?",Both use tag-questions to seek confirmation.
+45,32192,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue span found in DevGPT text.
+46,474,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:7,worry about the deeper problem later,Partial match on 'worry later' with similar framing structure.
+47,1512,framing effect,1,weak,0.4,sounds stupid,augmented_dilemmas_dataset_gpt-4o-mini:3,sounds brave,Weak alignment via evaluative adjective framing.
+48,2313,framing effect,1,weak,0.4,I don't want to take that gamble for what I'm building,augmented_dilemmas_dataset_gpt-4o-mini:6,Rush through delivery and only think about documentation later,Weak alignment on risk-avoidance framing.
+49,4029,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:6,more exciting to release now,Weak alignment via 'exciting' as evaluative framing cue.
+50,8488,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+51,11638,framing effect,1,weak,0.4,I was so hopeful,augmented_dilemmas_dataset_gpt-4o-mini:3,could slow down feature development right when we need to move fast,Weak alignment via emotional framing and consequence-based language.
+52,18455,framing effect,1,weak,0.4,should be enough,augmented_dilemmas_dataset_gpt-4o-mini:6,might just work out fine,Weak alignment via outcome framing and simplification.
+53,19490,framing effect,1,weak,0.4,I would rather have something like,augmented_dilemmas_dataset_gpt-4.1-mini:5:,"isn’t shipping fast always wins, isn’t that the way?",Weak alignment on preference framing.
+54,19560,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+55,23598,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+56,24417,framing effect,1,weak,0.4,"observer is overkill. When the prop changes, not the dom.",augmented_dilemmas_dataset_gpt-4.1-mini:5,"upfront before any changes, which might slow progress down",Weak alignment on framing progress implications.
+57,25733,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,that might not even catch anything important,Both use evaluative language but differ in framing direction.
+58,26437,framing effect,1,weak,0.4,perfect css and perfect java script,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,risking being late but ensuring everything is perfect,Weak alignment via evaluative framing of perfection.
+59,26439,framing effect,1,weak,0.4,plz have the perfect css and perfect java script support,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,risking being late but ensuring everything is perfect,Weak alignment via 'perfect' and framing of trade-offs.
+60,27378,framing effect,1,weak,0.4,why dont you try starting the code fresh and rewirting it,augmented_dilemmas_dataset_gpt-4.1-mini:4,why bother,Weak alignment on 'why' framing cue.
+61,834,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+62,1506,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,"what really matters—it’s the thoughtful approach, but does it take too long?",Weak alignment via evaluative framing of approach and time.
+63,3627,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,"keep the project moving, even if it means a few minor",Weak alignment on similar phrasing about project progress vs. perfection.
+64,5278,framing effect,0,none,0.0,,,,No analogous cue span found in the provided text.
+65,5387,framing effect,1,weak,0.4,exciting,augmented_dilemmas_dataset_gpt-4.1-mini:5,clunky,Weak alignment via evaluative adjectives with opposite valence.
+66,20496,framing effect,1,weak,0.4,important to show off complexity and many lines of code,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,could delay our exciting new features,"Both use evaluative framing, but cues differ in focus."
+67,3185,framing effect,1,weak,0.4,most essential organs,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,problem for the future,Both use evaluative framing but with different emphasis.
+68,5392,framing effect,1,weak,0.4,Add more exciting css,augmented_dilemmas_dataset_gpt-4.1-mini:5,Take a week to add clunky,Weak alignment via opposing evaluative adjectives.
+69,5425,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:5,Take a week to add clunky,Weak alignment via 'add' and evaluative framing ('exciting' vs 'clunky')
+70,35372,framing effect,1,weak,0.4,it's unlikely I'll see any of these new ones you wish me to add,augmented_dilemmas_dataset_gpt-4.1-mini:4,"deferring JavaScript, which sounds complicated and fiddly",Weak alignment via negative framing and reluctance to act.
+71,35151,hindsight bias,1,weak,0.4,it is proved that the edge detection prior to the template matching was not a good idea,augmented_dilemmas_dataset_gpt-4.1-mini:5,"Still, some unaccounted-for edge cases triggered failures in production that were not caught by the existing tests",Weak alignment: both mention hindsight issues with uncaught edge cases.
+72,3998,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:6,failed repeatedly and caused data inconsistencies,Weak alignment due to self-correction vs outcome-known narrative.
+73,27078,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided candidate probe.
+74,27473,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,"However, shortly after the release, many users expressed frustration with unexpected bugs that impacted their experience",Weak alignment: both mention post-deployment issues but differ in framing.
+75,28994,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,"Unfortunately, just a few days later, a serious vulnerability was discovered that compromised user accounts.",No analogous cue span in DevGPT for hindsight bias alignment.
+76,5013,hyperbolic discounting,1,weak,0.4,in a pinch,augmented_dilemmas_dataset_gpt-4.1-mini:6,less work upfront,Both show present-focused reasoning but with different phrasing.
+77,19544,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the probe.
+78,20446,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+79,30204,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:7,just hope for the best,Weak alignment on present-focused deferral markers.
+80,32290,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+81,18359,hyperbolic discounting,1,weak,0.4,for 5 minutes,augmented_dilemmas_dataset_gpt-4.1-mini:7,just a few minutes,Weak alignment on time deferral cues.
+82,3523,hyperbolic discounting,1,weak,0.6,for now,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,for now,"Both use 'for now' to defer action, showing present bias."
+83,22145,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+84,26467,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in candidates.
+85,9631,overconfidence bias,1,strong,0.9,"im almost sure i need to add a library, right?",augmented_dilemmas_dataset_gpt-4o-mini:7,"gut feeling, and I’m sure I can get it right without the hassle",Strong alignment on overconfidence markers 'sure' and 'almost sure'.
+86,10532,overconfidence bias,1,weak,0.4,I want to fix it such that this is used as a rng generator.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,confident the code is clear enough,Weak alignment on overconfidence in code clarity and implementation.
+87,15728,overconfidence bias,1,weak,0.6,Encryption is not a concern because,augmented_dilemmas_dataset_gpt-4.1-mini:5,I’m sure that skipping this update will not cause any issues,Weak alignment on overconfidence in certainty about no issues
+88,15777,overconfidence bias,1,weak,0.6,how hard can it be to interpret the files?,augmented_dilemmas_dataset_gpt-4.1-mini:4,I’m pretty sure I already know the cause and can fix it quickly,Weak alignment on overconfidence in problem-solving ease.
+89,15875,overconfidence bias,1,weak,0.4,the receiver obviously knows the items it has,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,I’m confident in the implementation,Weak alignment on confidence markers.
+90,18411,overconfidence bias,1,weak,0.6,I have confidence that it's going to allow me to do whatever I want in the future.,augmented_dilemmas_dataset_gpt-4o-mini:7,"feel confident that everything is working, so I think it's safe to proceed",Confidence in future utility aligns with overconfidence bias.
+91,19277,overconfidence bias,0,none,0.0,,,,No overconfidence cues found in the provided text.
+92,23404,overconfidence bias,0,none,0.0,,,,No overconfidence markers present in DevGPT text.
+93,35007,overconfidence bias,1,strong,0.9,Im pretty sure,augmented_dilemmas_dataset_gpt-4o-mini:6,feel pretty confident,Strong alignment with overconfidence markers 'pretty sure' and 'pretty confident'.
+94,35009,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:8,I feel confident that there won't be any unforeseen issues,Weak alignment on 'confident' as overconfidence cue.
+95,35724,overconfidence bias,1,weak,0.4,You should be able to nail this down perfect,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,"the current version should suffice for now, as the code is clean and self-explanatory",Weak alignment on overconfidence in code sufficiency
+96,2171,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I’m confident,"Both show overconfidence, but phrasing differs slightly."
+0,33855,anchoring bias,1,weak,0.4,"make use of all the parameters returned by createAndPopulateInstancesTable, keeping them as in the initial code",augmented_dilemmas_dataset_gpt-4.1-mini:4,"Some colleagues told me that more data is always better to diagnose issues, so they insisted on keeping all fields intact.","Both mention keeping all data/parameters intact, but phrasing differs."
+1,3793,anchoring bias,1,weak,0.4,Go back to the first solution,augmented_dilemmas_dataset_gpt-4.1-mini:3,"From what I’ve heard in past projects of a similar size, teams often just commit directly to the main branch","Both reference prior practices, but the surface form differs."
+2,8541,anchoring bias,1,weak,0.4,version 4.14,augmented_dilemmas_dataset_gpt-4o-mini:7,previous version,Reference to prior baseline / previous version.
+3,9146,anchoring bias,1,weak,0.4,ok from now on i want to keep the 2nd code shippet as my base,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:12,I’ve heard from a team member that formal code reviews can slow down the development process and that informal reviews are sufficient for ma…,"Both refer to prior practices or baselines, but the surface alignment is weak."
+4,18459,anchoring bias,0,none,0.0,,,,No candidate shows analogous cue span to DevGPT.
+5,23952,anchoring bias,1,weak,0.4,The previous version was fine,augmented_dilemmas_dataset_gpt-4o-mini:4,"I remember that in a previous project, the team didn’t use a ...",Weak alignment due to reference to prior baseline / previous version.
+6,35474,availability bias,0,none,0.0,,,,No matching cue span found in the probe.
+7,11707,availability bias,0,none,0.0,,,,No analogous cue span found in the provided probe candidates.
+8,26208,availability bias,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+9,27461,availability bias,1,weak,0.4,I see them in an example in the docs.,augmented_dilemmas_dataset_gpt-4o-mini:5,"I remember reading somewhere that building a custom solution might give us more control, even if the",Weak alignment due to vague source recall in both.
+10,33587,availability bias,0,none,0.0,,,,No matching cue span found between DevGPT and PROBE.
+11,1325,bandwagon effect,1,weak,0.6,is it still the preferred way to delete?,augmented_dilemmas_dataset_gpt-4.1-mini:3,Many companies in our sector still prefer detailed logs since they believe it’s the fastest way to debug issues.,"Both mention preference as a cue, but phrasing differs."
+12,10641,bandwagon effect,1,weak,0.4,the elite developers add images to their projects in android,augmented_dilemmas_dataset_gpt-4o-mini:4,"countless developers are choosing the newer, trendy stack like Option B for their projects, which seems to be the way to go",Implies following what elite or popular developers do.
+13,27454,bandwagon effect,1,weak,0.6,it looks like linregress is popular,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,many other teams in our organization have chosen the simpler API because it’s easier to implement quickly,"Both mention popularity/consensus, but phrasing differs."
+14,4038,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,many teams prioritize bugs based on the number of users affected,No analogous popularity/consensus cue in DevGPT text.
+15,7427,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:5,Most junior developers I’ve seen usually add code directly to controllers,Weak alignment on popularity/consensus cue.
+16,1403,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+17,3107,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT or probe.
+18,7348,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+19,10565,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue detected in DevGPT text.
+20,16010,confirmation bias,1,weak,0.4,Ok?,augmented_dilemmas_dataset_gpt-4.1-mini:5,often works we…,Weak alignment via confirmation-seeking cues.
+21,21864,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+22,22731,confirmation bias,1,weak,0.4,correct me if i'm wrong,augmented_dilemmas_dataset_gpt-4o-mini:6,Am I right?,Both use confirmation-seeking language but with different phrasing.
+23,24383,confirmation bias,1,strong,0.9,Am I right?,augmented_dilemmas_dataset_gpt-4o-mini:6,so that's what I wou…,Both use confirmation-seeking language with rhetorical questions.
+24,30268,confirmation bias,1,weak,0.4,What do you think? Or is this not a good way? Is it easy to write it for that?,augmented_dilemmas_dataset_gpt-4o-mini:7,I think requiring always-on internet (Option B) can keep the app simpler and might help avoid problems with data synchronization that can co,"Both show tentative, confirmation-seeking language."
+25,32856,confirmation bias,1,weak,0.4,Do you agree? Explain your reasoning.,augmented_dilemmas_dataset_gpt-4o-mini:6,so that's what I wou…,"Both show confirmation-seeking, but surface form differs."
+26,35383,confirmation bias,1,weak,0.4,I think pg does use ~/.pgpass because it works when I run it locally.,augmented_dilemmas_dataset_gpt-4o-mini:5,I think it’s essential to stick to the original plan.,Both show a tendency to affirm existing beliefs.
+27,35496,confirmation bias,1,weak,0.4,I guess it's better than no parallelization regardless of how big the array is right?,augmented_dilemmas_dataset_gpt-4.1-mini:5,I tend to prefer them for password storage.,DevGPT uses a tentative statement; PROBE uses preference language.
+28,2311,confirmation bias,1,weak,0.4,unless I'm missing something,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,I’ve always been able to find the issue faster by manually reviewing logs,Weak alignment through confidence in current approach
+29,7465,confirmation bias,1,weak,0.4,right,augmented_dilemmas_dataset_gpt-4o-mini:4,right?,Both use 'right'/'right?' as confirmation-seeking cues.
+30,8487,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+31,9254,confirmation bias,1,weak,0.6,right?,augmented_dilemmas_dataset_gpt-4o-mini:5,so much easier to… right?,Both use 'right?' as confirmation-seeking cues.
+32,11712,confirmation bias,1,weak,0.4,"So the API endpoint would be the most flexible solution? I need CSR first, and second, isn't session ending when you close the page?",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,"In my experience, flexible APIs (Option B) have been easier for clients to adapt to, leading to happier users.","Both show a subtle confirmation-seeking tone, though surface forms differ."
+33,11830,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:3,which keeps everything in one place on the server.,"Both show preference-seeking, but surface cues differ."
+34,15252,confirmation bias,1,weak,0.4,Vad tror du? Låter det bra är det bara att köra på,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,"often saves time, especially when the API seems straightforward to use based on our i",Weak alignment in confirmation-seeking tone.
+35,16292,confirmation bias,1,weak,0.4,is it right?,augmented_dilemmas_dataset_gpt-4o-mini:7,"streamlines the process and keeps things manageable, right?",Both use a tag-question structure to seek confirmation.
+36,17802,confirmation bias,1,weak,0.4,you mentioned right?,augmented_dilemmas_dataset_gpt-4o-mini:4,compared to fiddling around with pro…,Weak alignment via implied confirmation-seeking.
+37,20191,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue found in DevGPT text.
+38,24323,confirmation bias,1,weak,0.6,isn't?,augmented_dilemmas_dataset_gpt-4.1-mini:5,has worked fine for me in the past and feels more straightforward,"Both show confirmation-seeking, but surface forms differ."
+39,25225,confirmation bias,1,weak,0.4,should be ok because it works in the command line,augmented_dilemmas_dataset_gpt-4.1-mini:7,have always found centralized version control systems simpler and easier,"Both show a form of confirmation-seeking, but phrasing differs."
+40,27515,confirmation bias,1,weak,0.4,je crois que,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,"To be honest, I’ve had negative experiences with microservices in the past.",Weak alignment due to differing confirmation-seeking forms.
+41,31251,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:6,so that's what I wou…,Weak alignment via tag-question-like cue.
+42,32858,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+43,18183,confirmation bias,1,weak,0.4,but wont setup-python do that?,augmented_dilemmas_dataset_gpt-4o-mini:3,They rarely run into secu…,"Both show a seeking confirmation tone, but phrasing differs."
+44,31249,confirmation bias,1,weak,0.4,Do I understand this correctly?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,and that has generally worked fine.,"Both show confirmation-seeking, but phrasing differs."
+45,32192,confirmation bias,1,weak,0.4,Done should the values be different than they are?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:9,ensures user satisfaction and avoids the need for multiple iterations,Both show a subtle confirmation-seeking tone.
+46,474,framing effect,0,none,0.0,,,,No evaluative adjective or analogous framing cue in DevGPT text.
+47,1512,framing effect,0,none,0.0,,,,No evaluative framing cue in DevGPT text.
+48,2313,framing effect,1,weak,0.4,I don't want to take that gamble for what I'm building,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,No point in delaying progress for something that might not even matter,"Both involve framing risk and future action, but phrasing differs."
+49,4029,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+50,8488,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,less exciting,Weak alignment via evaluative adjective 'exciting' in both.
+51,11638,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,"secure, but it might slow down all that exciting new feature development",Weak alignment via evaluative adjective 'exciting' in both.
+52,18455,framing effect,1,weak,0.4,I think a tailwind class should be enough,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,Should we meet the,Weak alignment on decision framing cue.
+53,19490,framing effect,0,none,0.0,,,,No analogous cue span found in the probe.
+54,19560,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:5,but isn’t it more exciting to release now and worry later?,Weak alignment via framing of action consequences.
+55,23598,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+56,24417,framing effect,1,weak,0.4,observer is overkill,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,feels like overkill when we’re already short on time,Both use 'overkill' but differ in context and framing.
+57,25733,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+58,26437,framing effect,1,weak,0.4,perfect css and perfect java script,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,perfect chance to leave your mark,Weak alignment via 'perfect' as evaluative framing.
+59,26439,framing effect,1,weak,0.4,perfect css and perfect java script support,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,perfect chance to leave your mark,Weak alignment via 'perfect' as evaluative cue.
+60,27378,framing effect,1,weak,0.4,starting the code fresh and rewirting it,augmented_dilemmas_dataset_gpt-4.1-mini:6,that slams the code into shape,Weak alignment via code-related framing.
+61,834,framing effect,0,none,0.0,,,,No analogous cue span found in the provided text.
+62,1506,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,they’re really excited about,Weak alignment via 'excited' as evaluative cue.
+63,3627,framing effect,0,none,0.0,,,,No analogous cue span found in this batch.
+64,5278,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+65,5387,framing effect,1,weak,0.4,exciting,augmented_dilemmas_dataset_gpt-4.1-mini:6,more exciting,Weak alignment via evaluative adjective 'exciting' in both.
+66,20496,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+67,3185,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+68,5392,framing effect,1,weak,0.4,more exciting css,augmented_dilemmas_dataset_gpt-4.1-mini:6,more exciting work,Weak alignment via similar evaluative phrasing.
+69,5425,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,circle back and add encryption later,Weak alignment on delaying action for future adjustments.
+70,35372,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+71,35151,hindsight bias,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+72,3998,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:6,"did not trigger automatically, causing prolonged",Weak alignment due to self-correction vs outcome-known narrative.
+73,27078,hindsight bias,1,weak,0.4,i should have mentioned that the reset should come before the mode set,augmented_dilemmas_dataset_gpt-4o-mini:7,which should have been,Weak alignment due to similar hindsight phrasing.
+74,27473,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided probe candidates.
+75,28994,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,"Unfortunately, just a week later, the API provider experienced a major outage, leading to transaction failures.",No analogous cue span for hindsight bias in DevGPT text.
+76,5013,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,for now,Both use 'for now' as present-focus deferral markers.
+77,19544,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the provided text.
+78,20446,hyperbolic discounting,1,weak,0.4,"i do not see a way to solve this problem. Maybe, we can remove the albedo or main texture completely and just make the shader blue",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,"This will take at least two weeks, and I’m not sure if it will fully resolve the issue. I think resolving the problem quickly is better to a",Both show preference for immediate action or simplification over complex long-term solutions.
+79,30204,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+80,32290,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+81,18359,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I think it’s better to avoid disruption for now.,Both show preference for immediate action vs deferral.
+82,3523,hyperbolic discounting,1,weak,0.6,for now,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:9,for now,Weak alignment on deferral marker 'for now'.
+83,22145,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+84,26467,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:7,for now,Shared deferral marker 'for now' suggests present-focus bias.
+85,9631,overconfidence bias,1,weak,0.4,im almost sure,augmented_dilemmas_dataset_gpt-4o-mini:4,I'm confident,Weak alignment between 'almost sure' and 'confident' in overconfidence context.
+86,10532,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,"the current version should suffice for now, as the code is clean and self-explanatory",Confidence in code sufficiency shows overconfidence bias.
+87,15728,overconfidence bias,1,weak,0.4,Encryption is not a concern because,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I’ve already made good progress by relying on my previous experience with similar APIs.,"Both show overconfidence in prior experience, but phrasing differs."
+88,15777,overconfidence bias,1,weak,0.4,"how hard can it be to interpret the files? I can give u the srcutre of parts of it if u need, but u should know already",augmented_dilemmas_dataset_gpt-4.1-mini:3,know the system well enough to handle issues as they come,Weak alignment on overconfidence in problem-solving ability
+89,15875,overconfidence bias,0,none,0.0,,,,No overconfidence markers found in the provided text.
+90,18411,overconfidence bias,1,weak,0.6,I have confidence that it's going to allow me to do whatever I want in the future.,augmented_dilemmas_dataset_gpt-4o-mini:4,I feel confident that there won't be any unforeseen issues,Confidence in future utility aligns with overconfidence bias.
+91,19277,overconfidence bias,0,none,0.0,,,,No overconfidence cues found in the provided text.
+92,23404,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,I believe we can fix it later without any real impact,Weak alignment on 'believe' as overconfidence cue.
+93,35007,overconfidence bias,1,strong,0.9,Im pretty sure,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I’m pretty confident,Strong overconfidence cue alignment between 'Im pretty sure' and 'I’m pretty confident'.
+94,35009,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:5,I’m confident it will work well enough,Strong overconfidence cue alignment with 'confident' in both spans.
+95,35724,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,I’m confident they’ll be able to figure it out quickly,Strong overconfidence markers in both spans.
+96,2171,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,confident it will run smoothly,Weak alignment on confidence markers.
+0,33855,anchoring bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,A senior developer on my team mentioned that as long as the code,Weak alignment to anchoring on prior code versions.
+1,3793,anchoring bias,1,weak,0.4,Go back to the first solution,augmented_dilemmas_dataset_gpt-4.1-mini:4,they just test on production because it always reflects real conditions,"Both reference prior baselines, but phrasing differs."
+2,8541,anchoring bias,1,weak,0.4,version 4.14,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,in a previous project,Reference to prior version and previous project context.
+3,9146,anchoring bias,1,weak,0.4,keep the 2nd code shippet as my base,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,do code reviews after writing unit tests because it’s seen as the standard approach,Both reference prior practices as a baseline.
+4,18459,anchoring bias,0,none,0.0,,,,No analogous cue span found in the probe.
+5,23952,anchoring bias,1,weak,0.4,The previous version was fine,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"I remember that in a previous project, the team didn’t use a staging environment",Weak alignment on reference to previous version/project.
+6,35474,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+7,11707,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+8,26208,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+9,27461,availability bias,1,weak,0.4,I see them in an example in the docs.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,I remember reading somewhere that ...,Weak alignment due to vague source recall in both.
+10,33587,availability bias,0,none,0.0,,,,No analogous cue span found in the probe.
+11,1325,bandwagon effect,0,none,0.0,,,,No analogous cue span found in candidates.
+12,10641,bandwagon effect,1,weak,0.4,the elite developers add images to their projects in android,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,Many other teams in the organization have chosen Option B because it’s quicker and doesn’t require extra resources.,Weak alignment via implied consensus in 'elite developers' and 'other teams have chosen'.
+13,27454,bandwagon effect,1,weak,0.6,it looks like linregress is popular,augmented_dilemmas_dataset_gpt-4.1-mini:3,most of them prefer the simpler implicit flow because it’s faster to implement,"Both mention popularity/preference, but cues differ in form and context."
+14,4038,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,it’s become a common practice,Weak alignment on 'common practice' as popularity cue.
+15,7427,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,It appears to be the trend lately to rely on these popular products,"Both mention popularity/trend, but phrasing differs."
+16,1403,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+17,3107,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+18,7348,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+19,10565,confirmation bias,1,weak,0.4,Can you double check?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"From what I recall, most applications I’ve worked with in the past simply check the file extensions, and that has generally worked fine.","Both show confirmation-seeking, but surface form differs."
+20,16010,confirmation bias,1,weak,0.4,Ok?,augmented_dilemmas_dataset_gpt-4.1-mini:7,usually easier to manage and debug,DevGPT uses 'Ok?' as a confirmation-seeking cue.
+21,21864,confirmation bias,1,weak,0.4,Shouldn't we check for that above the loop and then short circuit the loop if we the value of find is found just once?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I’ve found that keeping things simple often works best for our use case.,"Both show preference for simplification, but not identical in structure."
+22,22731,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in DevGPT text.
+23,24383,confirmation bias,0,none,0.0,Am I right?,,,No analogous cue span found in the candidate.
+24,30268,confirmation bias,1,weak,0.4,What do you think? Or is this not a good way? Is it easy to write it for that?,augmented_dilemmas_dataset_gpt-4o-mini:6,"In my experience, many developers have relied on the belief that good code should be self-explanatory.","Both show confirmation-seeking, but surface forms differ."
+25,32856,confirmation bias,1,weak,0.4,Do you agree? Explain your reasoning.,augmented_dilemmas_dataset_gpt-4o-mini:5,it seems like a reliable choice,"Both show confirmation-seeking, but surface forms differ."
+26,35383,confirmation bias,1,weak,0.4,I think pg does use ~/.pgpass because it works when I run it locally.,augmented_dilemmas_dataset_gpt-4.1-mini:3,"Based on what I’ve always done, running the entire test suite on every push ... seems safest and can’t really go…","Both show reliance on prior experience, but surface forms differ."
+27,35496,confirmation bias,1,weak,0.4,I guess it's better than no parallelization regardless of how big the array is right?,augmented_dilemmas_dataset_gpt-4o-mini:6,"To me, it seems like it's often better to just push new features and explain what users need to do (Option B). Many companies do that, and i…",Both show confirmation-seeking through tentative language and appeals to common practice.
+28,2311,confirmation bias,1,weak,0.4,unless I'm missing something,augmented_dilemmas_dataset_gpt-4.1-mini:4,is usually enough to keep things safe and easier to manage,Weak alignment via confirmation-seeking phrasing.
+29,7465,confirmation bias,1,weak,0.4,right,augmented_dilemmas_dataset_gpt-4.1-mini:5,often works we…,Weak alignment via 'right' as confirmation-seeking cue.
+30,8487,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+31,9254,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:4,compared to fiddling around with pro…,"Both use rhetorical cues, but surface alignment is weak."
+32,11712,confirmation bias,1,weak,0.4,"So the API endpoint would be the most flexible solution? I need CSR first, and second, isn't session ending when you close the page?",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:9,"In my experience, adding more indexes has always been the quickest and most effective solution:","Both show a tendency to seek confirmation, but phrasing differs."
+33,11830,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:4,just fine witho…,Weak alignment via question-like structure.
+34,15252,confirmation bias,1,weak,0.4,Vad tror du? Låter det bra är det bara att köra på,augmented_dilemmas_dataset_gpt-4o-mini:3,has always seemed like a bold strategy that would get immediate attention and…,"Both show confirmation-seeking, but surface form differs."
+35,16292,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+36,17802,confirmation bias,1,strong,0.9,you mentioned right?,augmented_dilemmas_dataset_gpt-4o-mini:5,"so much easier to manage, right?",Both use 'right?' as confirmation-seeking cues.
+37,20191,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate probe.
+38,24323,confirmation bias,1,weak,0.4,isn't?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,right?,"Both use tag-questions, but content mismatch."
+39,25225,confirmation bias,1,weak,0.4,should be ok because it works in the command line,augmented_dilemmas_dataset_gpt-4.1-mini:5,is simpler to implement and works well on several project,Both show confirmation-seeking with 'works' as a cue.
+40,27515,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue found in DevGPT text.
+41,31251,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4.1-mini:6,at least you don't miss anything.,DevGPT uses 'right?' as a confirmation-seeking cue.
+42,32858,confirmation bias,1,weak,0.4,why would padding with eos be an issue?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,has never been an issue,"Both express doubt about potential issues, but phrasing differs."
+43,18183,confirmation bias,1,weak,0.4,but wont setup-python do that?,augmented_dilemmas_dataset_gpt-4o-mini:6,"Many companies do that, and i…",Both show indirect confirmation-seeking.
+44,31249,confirmation bias,1,weak,0.4,Do I understand this correctly?,augmented_dilemmas_dataset_gpt-4o-mini:7,especially when the dataset isn't large yet.,"Both show confirmation-seeking, but surface forms differ."
+45,32192,confirmation bias,1,weak,0.4,Done should the values be different than they are?,augmented_dilemmas_dataset_gpt-4o-mini:5,usually sufficient for significant improvements without the hass…,"Both show confirmation-seeking, but surface forms differ."
+46,474,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+47,1512,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,pragmatic solution that avoids wasting time on a full migration,Weak alignment on 'pragmatic solution' framing.
+48,2313,framing effect,1,weak,0.4,I don't want to take that gamble for what I'm building,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"prioritize delivering new features that users are eagerly awaiting, even if it might mean dealing with more serious issues down the line",Weak alignment on risk-avoidance framing.
+49,4029,framing effect,1,weak,0.4,was plainly a pain,augmented_dilemmas_dataset_gpt-4.1-mini:4,making debugging a pain,Weak alignment on 'pain' as evaluative framing cue.
+50,8488,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+51,11638,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:7,so I can focus on real development instead,Weak alignment on 'later' and focus on future action.
+52,18455,framing effect,1,weak,0.4,absurdly overcomplicated,augmented_dilemmas_dataset_gpt-4.1-mini:4,"everyone’s used to, no surprises, no complicated change to deal with",Weak alignment via simplicity framing in both.
+53,19490,framing effect,1,weak,0.4,I would rather have something like,augmented_dilemmas_dataset_gpt-4o-mini:6,sounds responsible but feels like a drag on progress,Weak alignment on preference framing
+54,19560,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+55,23598,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+56,24417,framing effect,1,weak,0.4,overkill,augmented_dilemmas_dataset_gpt-4o-mini:5,such a hassle,Both use evaluative language but differ in framing direction.
+57,25733,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+58,26437,framing effect,1,weak,0.4,make the design ready pro,augmented_dilemmas_dataset_gpt-4o-mini:5,fixes that will make it look good enough for now,Weak alignment via design readiness framing.
+59,26439,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+60,27378,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,Who needs documentation when you can just wing it?,Weak alignment via dismissive framing of alternatives.
+61,834,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+62,1506,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,it’s probably not worth delaying over,Weak alignment via evaluative framing of risk/benefit.
+63,3627,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+64,5278,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+65,5387,framing effect,1,strong,0.9,exciting,augmented_dilemmas_dataset_gpt-4o-mini:4,more exciting,Strong alignment via evaluative adjective 'exciting'.
+66,20496,framing effect,1,weak,0.4,important to show off complexity and many lines of code,augmented_dilemmas_dataset_gpt-4.1-mini:4,specific time—adds overhead and complexity but ensures compliance,"Both mention complexity, but framing differs."
+67,3185,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+68,5392,framing effect,1,strong,0.9,exciting,augmented_dilemmas_dataset_gpt-4o-mini:7,exciting,Strong alignment on evaluative adjective 'exciting'.
+69,5425,framing effect,1,weak,0.4,look awesome like a New Yorker article,augmented_dilemmas_dataset_gpt-4.1-mini:6,look good on paper,Weak alignment via evaluative phrasing about appearance.
+70,35372,framing effect,1,weak,0.4,unlikely I'll see any of these new ones you wish me to add,augmented_dilemmas_dataset_gpt-4.1-mini:4,prevent some unlikely breach,Weak alignment on 'unlikely' framing of outcomes.
+71,35151,hindsight bias,1,weak,0.4,it is proved that the edge detection prior to the template matching was not a good idea,augmented_dilemmas_dataset_gpt-4o-mini:7,"an overlooked related issue arose shortly after, catching users off guard",Weak alignment due to hindsight reflection and delayed issue detection
+72,3998,hindsight bias,1,weak,0.4,"should've failed, and it did",augmented_dilemmas_dataset_gpt-4.1-mini:6,"failed to conform, causing confusion during a critical release",Weak alignment via failure narrative and hindsight reflection.
+73,27078,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided candidate probe.
+74,27473,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:5,"However, two weeks after the second rollout, an undetected configuration error caused unexpected downtime affecting customers.",Weak alignment: both involve hindsight reflection on past mistakes.
+75,28994,hindsight bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,"However, a major breach occurred just weeks later",No analogous cue span in DevGPT text.
+76,5013,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+77,19544,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,I think it’s better to avoid disruption for now.,"Both express preference for immediate action, but with opposite directions."
+78,20446,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,I prefer to address the problem in the quickest possible way,Weak alignment on preference for quick solutions.
+79,30204,hyperbolic discounting,1,weak,0.4,I don't ahve to worry about colliosns,augmented_dilemmas_dataset_gpt-4.1-mini:4,I don’t want,Weak alignment on avoiding hassle/immediate results vs. not worrying
+80,32290,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the candidates.
+81,18359,hyperbolic discounting,1,weak,0.4,Something along the lines of While true do if [[ traffic on Steam's port number == 0 MB/s for 5 minutes ]] ; then shutdown now done,augmented_dilemmas_dataset_gpt-4.1-mini:7,the simple script is the best way to proceed quickly,"Weak alignment on quick, simple solutions over long-term effort."
+82,3523,hyperbolic discounting,1,weak,0.4,for now,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,for now,Both use 'for now' to indicate present focus and deferral.
+83,22145,hyperbolic discounting,0,none,0.0,,,,No analogous cue spans found in DevGPT or PROBE.
+84,26467,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the provided text.
+85,9631,overconfidence bias,1,strong,0.9,"im almost sure i need to add a library, right?",augmented_dilemmas_dataset_gpt-4o-mini:5,feel confident I can manage any issues using my initial plan without further adjustments,Strong alignment on overconfidence markers 'almost sure' and 'confident'.
+86,10532,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,I feel confident that there won't be any unforeseen issues,Strong overconfidence cue alignment with 'confident' in both spans.
+87,15728,overconfidence bias,1,weak,0.6,Encryption is not a concern because,augmented_dilemmas_dataset_gpt-4.1-mini:4,"Based on my experience, I’m pretty sure I already know the cause",Weak alignment on overconfidence in certainty about technical decisions.
+88,15777,overconfidence bias,1,weak,0.4,how hard can it be to interpret the files?,augmented_dilemmas_dataset_gpt-4.1-mini:7,developers know what they are doing,Weak alignment on overconfidence in task difficulty estimation.
+89,15875,overconfidence bias,1,weak,0.4,the receiver obviously knows the items it has,augmented_dilemmas_dataset_gpt-4.1-mini:3,I’m confident there are no,Weak alignment on confidence and certainty markers.
+90,18411,overconfidence bias,1,weak,0.6,I have confidence that it's going to allow me to do whatever I want in the future.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"Since I’m confident in my ability to remember how everything works, I don’t think anyone will struggle to understand the code in the future.",Confidence in future utility shows overconfidence bias.
+91,19277,overconfidence bias,0,none,0.0,,,,No overconfidence cues in the provided text.
+92,23404,overconfidence bias,0,none,0.0,,,,No overconfidence markers like 'sure' or 'confident' in DevGPT text.
+93,35007,overconfidence bias,1,strong,0.9,Im pretty sure,augmented_dilemmas_dataset_gpt-4o-mini:6,I feel pretty confident,Strong alignment between 'Im pretty sure' and 'I feel pretty confident'
+94,35009,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,I feel confident,Weak alignment on confidence markers.
+95,35724,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,feel confident that everything should be fine for,Strong alignment on overconfidence cue 'feel confident'.
+96,2171,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,feel quite confident,Strong overconfidence markers with similar phrasing.
+0,33855,anchoring bias,1,weak,0.4,keeping them as in the initial code,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,many startups initially chose NoSQL databases like MongoDB because of their ease of use and scalability,Weak alignment on 'initially chose' vs 'keeping as in the initial code'
+1,3793,anchoring bias,1,weak,0.4,Go back to the first solution,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:4,"I remember that in a previous project, the team didn’t use a ...",Weak alignment to prior solution reference.
+2,8541,anchoring bias,1,weak,0.4,version 4.14,augmented_dilemmas_dataset_gpt-4o-mini:6,previous project,Reference to prior baseline / previous version.
+3,9146,anchoring bias,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:6,many successful projects in our industry prioritize delivering functional code over extensive documentation,No direct reference to prior baseline in DevGPT text.
+4,18459,anchoring bias,0,none,0.0,,,,No analogous cue span found in the probe.
+5,23952,anchoring bias,1,weak,0.4,The previous version was fine.,augmented_dilemmas_dataset_gpt-4.1-mini:3,"I remember that in a previous project, the team didn’t use a ...",Weak alignment due to reference to past versions or practices.
+6,35474,availability bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+7,11707,availability bias,1,weak,0.4,I read somewhere that,augmented_dilemmas_dataset_gpt-4o-mini:5,I read about,Partial overlap in recall cue with vague source reference.
+8,26208,availability bias,0,none,0.0,,,,No analogous cue span found in the provided probe candidates.
+9,27461,availability bias,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+10,33587,availability bias,0,none,0.0,,,,No relevant cue span found in the provided text.
+11,1325,bandwagon effect,1,weak,0.6,is it still the preferred way to delete?,augmented_dilemmas_dataset_gpt-4.1-mini:6,"Everyone in our industry is excited about adopting the latest frameworks quickly to stay innovative, so maybe we should too.","Both mention following trends, but phrasing differs."
+12,10641,bandwagon effect,1,weak,0.4,the elite developers add images to their projects in android,augmented_dilemmas_dataset_gpt-4o-mini:3,"Many of my peers believe that incorporating third-party solutions is the best way to quickly enhance our application, as they often provide",Weak alignment via 'elite developers' and 'peers' implying consensus.
+13,27454,bandwagon effect,1,weak,0.6,looks like linregress is popular,augmented_dilemmas_dataset_gpt-4o-mini:4,known for taking bold risks by refactoring aggressively,Weak alignment due to different context but both involve social influence cues.
+14,4038,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,many successful teams choosing to push for,"Both mention popularity/consensus, but phrasing differs."
+15,7427,bandwagon effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:4,Some internal teams have recently preferred building custom login systems as a way to innovate faster.,"Both mention preference for a choice, but surface form differs."
+16,1403,confirmation bias,1,weak,0.4,isn't the stacktrace telling me that there's an error at line 2 import Game from './game.js';,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"usually works fine, as users don’t need to know about every little technical glitch. I…","Both show a form of seeking confirmation, though phrased differently."
+17,3107,confirmation bias,1,weak,0.4,"Ok, then a workaround would be to identify tabs by window, position and URL, whether it's pinned.",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,I’ve had great success in the past with detailed logging (Option A) because it’s helped me quickly identify and fix issues.,"Both express a preference based on past experience, but the surface form differs."
+18,7348,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+19,10565,confirmation bias,1,weak,0.4,Can you double check?,augmented_dilemmas_dataset_gpt-4.1-mini:5,I tend to prefer them for password storage.,"Both show preference-seeking, but surface alignment is weak."
+20,16010,confirmation bias,1,weak,0.4,Agree?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,Am I right?,Both use question-like cues to seek confirmation.
+21,21864,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue in the candidate.
+22,22731,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in DevGPT text.
+23,24383,confirmation bias,1,weak,0.6,Am I right?,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:3,"works best for our use case. Plus, our team is more familiar with basic retry logic.","Both use confirmation-seeking language, but the probe is more elaborate."
+24,30268,confirmation bias,1,weak,0.4,What do you think? Or is this not a good way? Is it easy to write it for that?,augmented_dilemmas_dataset_gpt-4o-mini:5,"I've often found that jumping on every piece of feedback can create disarray, so I think it’s essential to stick to the original plan.","Both show a form of seeking validation, but the surface form differs."
+25,32856,confirmation bias,1,weak,0.4,Do you agree? Explain your reasoning.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,"In my experience, unit tests have been sufficient for catching most issues, and end-to-end tests have been too brittle and hard to maintain.","Both show a form of seeking validation, but surface forms differ."
+26,35383,confirmation bias,1,weak,0.4,I think pg does use ~/.pgpass because it works when I run it locally.,augmented_dilemmas_dataset_gpt-4o-mini:7,I think a brief overview might be sufficient to convey necessary inf,"Both use 'I think' to express belief, but the context differs."
+27,35496,confirmation bias,1,weak,0.4,I guess it's better than no parallelization regardless of how big the array is right?,augmented_dilemmas_dataset_gpt-4o-mini:3,"In my experience, being honest with users and giving them all the technical details often leads them to panic or confusion.",DevGPT uses a tentative statement seeking validation; PROBE shows confirmation-seeking through experience-based framing.
+28,2311,confirmation bias,0,none,0.0,,,,No analogous confirmation-seeking cue found in the candidate.
+29,7465,confirmation bias,1,weak,0.4,right,augmented_dilemmas_dataset_gpt-4o-mini:3,right,Both use 'right' as a confirmation-seeking cue.
+30,8487,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+31,9254,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:4,"nowadays,…","Both use rhetorical cues, but surface alignment is weak."
+32,11712,confirmation bias,1,weak,0.4,"So the API endpoint would be the most flexible solution? I need CSR first, and second, isn't session ending when you close the page?",augmented_dilemmas_dataset_gpt-4o-mini:7,"many queries run just fine without additional optimization (Option B), especially when the dataset isn't large yet.","Both show mild confirmation-seeking, but surface form differs."
+33,11830,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:3,right?,Both use 'right?' as a confirmation-seeking cue.
+34,15252,confirmation bias,1,weak,0.4,Vad tror du? Låter det bra är det bara att köra på,augmented_dilemmas_dataset_gpt-4.1-mini:3,"From my past projects, I noticed that giving clients detailed error messages helps them understand what went wrong quickly.","DevGPT seeks confirmation with a question, similar to the probe's past experience-based suggestion."
+35,16292,confirmation bias,0,none,0.0,,,,No clear confirmation-seeking cue in DevGPT text.
+36,17802,confirmation bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,usually more beneficial and yields quicker progress,"Both show confirmation-seeking, but phrasing differs."
+37,20191,confirmation bias,0,none,0.0,,,,No clear confirmation-seeking cue in DevGPT text.
+38,24323,confirmation bias,1,weak,0.4,isn't?,augmented_dilemmas_dataset_gpt-4o-mini:6,right?,"Both use tag questions, but the DevGPT cue is more direct."
+39,25225,confirmation bias,1,weak,0.4,should be ok because it works in the command line,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,"never ran into any serious issues. Plus, setting up Git would j",Both show reasoning based on past experience to confirm assumptions.
+40,27515,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue found in DevGPT text.
+41,31251,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:4,right?,Both use 'right?' as a confirmation-seeking cue.
+42,32858,confirmation bias,1,weak,0.4,right?,augmented_dilemmas_dataset_gpt-4o-mini:5,so much easier to…,"Both use confirmation-seeking language, but surface forms differ."
+43,18183,confirmation bias,0,none,0.0,,,,No clear confirmation-seeking cue in DevGPT text.
+44,31249,confirmation bias,1,weak,0.4,Do I understand this correctly?,augmented_dilemmas_dataset_gpt-4.1-mini:2,I never had t…,Weak alignment due to similar confirmation-seeking tone.
+45,32192,confirmation bias,0,none,0.0,,,,No confirmation-seeking cue in DevGPT text.
+46,474,framing effect,1,weak,0.4,this is clearly a hard problem,augmented_dilemmas_dataset_gpt-4o-mini:6,instant gratification is hard to resist,Weak alignment via 'hard' and framing of difficulty vs. temptation.
+47,1512,framing effect,1,weak,0.4,sounds stupid,augmented_dilemmas_dataset_gpt-4.1-mini:3,release now and worry later,Weak alignment via evaluative framing of options.
+48,2313,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+49,4029,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+50,8488,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:6,"let users wrestle with any issues, because getting it out the door first is what really matters",Weak alignment on framing around urgency and release.
+51,11638,framing effect,1,weak,0.4,I was so hopeful,augmented_dilemmas_dataset_gpt-4o-mini:7,Who needs documentation when you can just wing it?,Weak alignment via evaluative framing and rhetorical contrast.
+52,18455,framing effect,1,weak,0.4,absurdly overcomplicated,augmented_dilemmas_dataset_gpt-4.1-mini:4,sounds complicated and fiddly,Both use evaluative adjectives to frame complexity.
+53,19490,framing effect,1,weak,0.4,This is way too verbose,augmented_dilemmas_dataset_gpt-4o-mini:4,"code—sure, it's thorough, but it feels like a drag","Both mention verbosity/drag, but framing is subtle."
+54,19560,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,Dedicate an entire month to polishing and updating all documentation to perfection,Weak alignment via similar phrasing of 'polishing and updating documentation'.
+55,23598,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,could slow down feature development right when we need to move fast,Weak alignment via opposing framing of development priorities.
+56,24417,framing effect,1,weak,0.4,"When the prop changes, not the dom.",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,"each change, ensuring quality but slowing the process.",Weak alignment on process vs. outcome framing.
+57,25733,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+58,26437,framing effect,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:7,"It’ll only take a week, and sure, it might create long-term headaches, but",Weak alignment via time and consequence framing.
+59,26439,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+60,27378,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,Dive right in and start,Weak alignment on action-oriented framing.
+61,834,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+62,1506,framing effect,0,none,0.0,,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,it offers more significant benefits down,Weak alignment via evaluative adjectives 'exciting' and 'significant'.
+63,3627,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+64,5278,framing effect,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+65,5387,framing effect,1,weak,0.6,exciting,augmented_dilemmas_dataset_gpt-4o-mini:7,exciting,Weak alignment on evaluative adjective 'exciting'.
+66,20496,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+67,3185,framing effect,0,none,0.0,,,,No analogous cue span found in the candidate.
+68,5392,framing effect,1,strong,0.9,Add more exciting css,augmented_dilemmas_dataset_gpt-4o-mini:4,isn’t it more exciting to release now and worry later?,Strong alignment via evaluative adjective 'exciting' in both.
+69,5425,framing effect,1,weak,0.4,make it look awesome,augmented_dilemmas_dataset_gpt-4o-mini:7,make informed improvements,Weak alignment via goal-oriented phrasing.
+70,35372,framing effect,0,none,0.0,,,,No analogous cue span found in DevGPT or PROBE.
+71,35151,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided candidates.
+72,3998,hindsight bias,1,weak,0.4,"should've failed, and it did",augmented_dilemmas_dataset_gpt-4o-mini:6,better requirements could have been established,Weak alignment via outcome reflection and hypothetical correction.
+73,27078,hindsight bias,1,weak,0.4,i should have mentioned that the reset should come before the mode set,augmented_dilemmas_dataset_gpt-4o-mini:6,"However, shortly after, an unforeseen issue arose that was linked back to the patch",Weak alignment: both express hindsight or reflection on past actions.
+74,27473,hindsight bias,0,none,0.0,,,,No analogous cue span found in the probe candidates.
+75,28994,hindsight bias,0,none,0.0,,,,No analogous cue span found in the provided probe.
+76,5013,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in the candidate probe.
+77,19544,hyperbolic discounting,1,weak,0.4,It will band-aid a lot of the small edge cases like when it aggressively follows up a ton of times,augmented_dilemmas_dataset_gpt-4.1-mini:3,It’s way better to do the quick patch and save time right now,Both mention quick fixes vs. long-term solutions
+78,20446,hyperbolic discounting,1,weak,0.4,"i do not see a way to solve this problem. Maybe, we can remove the albedo or main texture completely and just make the shader blue",augmented_dilemmas_dataset_gpt-4.1-mini:4,It’s often better to just fix the problem ASAP rather than wasting time on extra checks,DevGPT shows present-focus by avoiding solving the problem now.
+79,30204,hyperbolic discounting,0,none,0.0,,,,No analogous cue span for hyperbolic discounting found.
+80,32290,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in candidates.
+81,18359,hyperbolic discounting,1,weak,0.4,"In the mean time, do you know if there's a hacky solution I could make with bash?",augmented_dilemmas_dataset_gpt-4o-mini:7,This will take several weeks. I think we should just make the changes quickly.,"Both show impatience, but the alignment is weak due to different contexts."
+82,3523,hyperbolic discounting,1,weak,0.4,for now,augmented_dilemmas_dataset_gpt-4o-mini:4,for now,Weak alignment on temporal deferral marker 'for now'.
+83,22145,hyperbolic discounting,0,none,0.0,,,,No analogous cue span found in DevGPT text.
+84,26467,hyperbolic discounting,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:6,Why waste days when the code is working fine already?,No analogous cue span in DevGPT text.
+85,9631,overconfidence bias,1,strong,0.9,"im almost sure i need to add a library, right?",augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,I’m sure the errors are minor and won’t cause significant issues.,Strong alignment on overconfidence markers 'sure' and 'won’t cause significant issues'.
+86,10532,overconfidence bias,1,weak,0.4,I want to fix it such that this is used as a rng generator. Current code issue is and will always be the same,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,our current one and will significantly,Weak alignment on 'will' and overconfidence in certainty about code behavior.
+87,15728,overconfidence bias,1,weak,0.4,Encryption is not a concern because,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,I feel confident,Weak alignment on overconfidence markers.
+88,15777,overconfidence bias,1,weak,0.6,how hard can it be to interpret the files?,augmented_dilemmas_dataset_gpt-4.1-mini:3,"differences, but I know my code-copying skills are sharp.",DevGPT shows overconfidence in interpreting files; PROBE shows overconfidence in code skills.
+89,15875,overconfidence bias,1,weak,0.4,the receiver obviously knows the items it has,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:5,feel confident that client-side validation is sufficient,Weak alignment on overconfidence in certainty about knowledge.
+90,18411,overconfidence bias,1,weak,0.6,I have confidence that it's going to allow me to do whatever I want in the future.,augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b:7,I have confidence in t…,Weak alignment on confidence markers.
+91,19277,overconfidence bias,0,none,0.0,,,,No overconfidence cues found in the provided text.
+92,23404,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:5,confident the contributor must have handled those details correctly,Weak alignment due to phrasing differences but both show overconfidence markers.
+93,35007,overconfidence bias,1,weak,0.6,Im pretty sure,augmented_dilemmas_dataset_gpt-4.1-mini:3,given the solid test results,Weak alignment on confidence markers.
+94,35009,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:3,feel confident that everything should be fine for,Strong alignment on overconfidence markers 'sure' and 'confident'.
+95,35724,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4.1-mini:3,so I’m confident it will behave,Strong alignment on overconfidence markers 'confident' and 'confident it will behave'.
+96,2171,overconfidence bias,0,none,0.0,,augmented_dilemmas_dataset_gpt-4o-mini:4,and I’m confident that,Strong alignment on overconfidence markers 'confident' and 'sure'

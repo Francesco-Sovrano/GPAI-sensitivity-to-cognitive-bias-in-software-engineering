@@ -223,7 +223,7 @@ FEATURE_LABELS = {
 	"requirements_terms": "requirements",
 	"bug_failure_terms": "bugs/failures",
 	"testing_quality_terms": "testing/quality",
-	"time_pressure_deadline": "time pressure",
+	"time_pressure_deadline": "time pressure/deadline",   # <- align with LaTeX
 	"process_governance_terms": "process/governance",
 	"estimation_uncertainty": "estimation uncertainty",
 	"performance_scalability": "performance/scalability",
@@ -238,7 +238,7 @@ FEATURE_LABELS = {
 	"data_db_terms": "data/DB",
 	"frontend_perf_accessibility": "frontend perf/accessibility",
 	"mobile_release": "mobile release",
-	"cloud_platforms": "cloud platform",
+	"cloud_platforms": "cloud platforms",                 # <- align with LaTeX
 	"pm_process_terms": "PM process",
 	"api_platform_terms": "API/platform",
 	"cost_finops": "FinOps/cost",
@@ -256,45 +256,53 @@ FEATURE_LABELS = {
 }
 
 FEATURE_GROUPS = {
-	# --- Lexicon feature groups (edit names/order to match the paper text) ---
+	# --- Groups and order aligned with LaTeX framing ---
+	"Throughput-centric talk": [
+		"performance_scalability",
+		"data_db_terms",
+	],
 	"Process & planning": [
 		"requirements_terms",
 		"pm_process_terms",
 		"process_governance_terms",
 		"estimation_uncertainty",
+	],
+	"Coordination under time pressure": [
+		"collaboration_conflict",
 		"time_pressure_deadline",
 	],
 	"Quality & reliability": [
 		"bug_failure_terms",
-		"testing_quality_terms",
 		"incident_reliability",
 		"observability_terms",
-		"performance_scalability",
 		"security_privacy_terms",
+	],
+
+	"Emerging themes": [
+		"ml_ai_terms",
+		"cost_finops",
 	],
 	"Engineering debt & coordination": [
 		"tooling_infra_terms",
 		"legacy_tech_debt",
 		"refactoring_design_terms",
-		"documentation_terms",
-		"collaboration_conflict",
 	],
+	
 	"Product surface": [
-		"data_db_terms",
 		"frontend_perf_accessibility",
 		"mobile_release",
 	],
-	# Example from the review comment:
-	"Platform Scope": [
+
+	"Platform scope": [
 		"api_platform_terms",
 		"cloud_platforms",
 	],
-	"Emerging themes": [
-		"cost_finops",
-		"ml_ai_terms",
+	"Guardrails": [
+		"testing_quality_terms",
+		"documentation_terms",
 	],
-	# --- Keep these at the end ---
-	"General language markers": [
+
+	"Tone cues": [
 		"negations",
 		"comparatives",
 		"superlatives",
@@ -306,6 +314,7 @@ FEATURE_GROUPS = {
 		"performance_judgment",
 	],
 }
+
 
 def compile_lexicon(lex=None):
 	lex = SE_LEXICON if lex is None else lex
