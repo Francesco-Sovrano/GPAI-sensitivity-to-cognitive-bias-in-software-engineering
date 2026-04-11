@@ -1,0 +1,23 @@
+Artifact badge claims: Functional, Reusable, Available.
+Version: v1.0.0
+
+Why this artifact should be considered FUNCTIONAL
+- It contains executable scripts for the main analyses reported in the paper.
+- It includes a lightweight offline smoke test that can be run quickly from packaged data and produces concrete expected outputs.
+- It includes precomputed outputs, adjudicated annotations, figures, and codebooks that let reviewers inspect the main results even without re-running the entire API-based matrix.
+
+Why this artifact should be considered REUSABLE
+- The package is documented with dedicated README, REQUIREMENTS, INSTALL, and STATUS files.
+- The scripts are organized by research question / analysis stage.
+- Reusable intermediate products are included (CSV summaries, PDF figures, lexicon/codebook, adjudicated qualitative labels, and corrected DevGPT outputs).
+- The batch runner has been sanitized so that credentials are no longer embedded in the release.
+
+Why this artifact should be considered AVAILABLE
+- The intended archival release is a public Zenodo snapshot with a version-specific DOI.
+- The development repository is listed separately as a companion resource.
+- The artifact uses an open-source license (MIT).
+
+Scope and notes
+- The full API-based experiment rerun requires the benchmark JSON files listed in `dataset/README.md` and provider credentials.
+- The final Zenodo release should include those benchmark JSON files together with this documented package.
+- The DevGPT dataset itself is external and must be downloaded separately; the package documents that dependency explicitly.

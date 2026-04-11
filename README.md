@@ -1,14 +1,34 @@
 # Replication Package — Mitigating Prompt‑Induced Cognitive Biases in GPAI for Software Engineering
 
-This repository is the **replication package** for the paper *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering*. It contains the datasets, experiment scripts, and plotting utilities needed to reproduce the results reported in the paper.
+This repository is the **replication package** for the paper *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering*. It contains the scripts, data products, annotations, and documentation needed to inspect and reproduce the results reported in the paper across four parts of the study:
 
-> **Dataset provenance.** The dilemmas and axiomatic backgrounds used here come from the **PROBE‑SWE** benchmark (dynamic SE dilemmas with biased/unbiased paired prompts). A dump is included under `./dataset/`.
+1. controlled paired-prompt experiments on PROBE-SWE-derived software-engineering dilemmas;
+2. strategy-effectiveness aggregation and figure generation for RQ1 and RQ2;
+3. thematic coding / lexicon-based analysis of GPAI system behaviours for RQ3;
+4. open-ended qualitative analysis and post-hoc DevGPT validation for RQ4 and the real-world prompt audit.
+
+A copy of the paper is included in this package as:
+- [FSE_2026_Mitigating_Prompt_Induced_Cognitive_Biases_in_General_Purpose_AI_for_Software_Engineering.pdf](paper/FSE_2026_Mitigating_Prompt_Induced_Cognitive_Biases_in_General_Purpose_AI_for_Software_Engineering.pdf)
+
+
+> **Dataset provenance.** The dilemmas and axiomatic backgrounds used for the main experiments come from the **PROBE‑SWE** benchmark (dynamic SE dilemmas with biased/unbiased paired prompts). A dump is included under `./dataset/`, and the original benchmark is available at: <https://github.com/Francesco-Sovrano/PROB-SWE>.
 >
 > The **DevGPT** post‑hoc analysis additionally relies on the external DevGPT dataset (not redistributed here); see the DevGPT section below for download instructions.
 
 ---
 
 ## Contents
+
+Top-level files required for FSE artifact evaluation:
+
+- `README.md` - overview, reproduction paths, and artifact location.
+- `REQUIREMENTS` - hardware/software requirements.
+- `INSTALL` - installation steps, smoke test, and expected outputs.
+- `STATUS` - claimed badges and justification.
+- `LICENSE` - distribution rights (MIT).
+- `paper/FSE_2026_Mitigating_Prompt_Induced_Cognitive_Biases_in_General_Purpose_AI_for_Software_Engineering.pdf` - copy of the accepted paper.
+
+Main research material:
 
 - `1_compute_bias_sensitivity.py` — run the core experiments for a given model and prompting strategy.
 - `2_visualize_bias_sensitivity.py` — generate per‑bias plots, complexity‑tier breakdowns, and summary PDFs.
@@ -93,6 +113,22 @@ source keys.env
 ---
 
 ## Quick Start
+
+The full controlled prompt experiments require:
+
+- the benchmark JSON files in `dataset/` named `augmented_dilemmas_dataset_*.json`;
+- API credentials for the selected model provider(s);
+- internet access.
+
+The intended full-run workflow is:
+
+1. install the Python dependencies;
+2. export `OPENAI_API_KEY` and/or `GROQ_API_KEY`;
+3. run `1_compute_bias_sensitivity.py` with the desired strategy flags;
+4. run `2_visualize_bias_sensitivity.py` and `3_analyze_strategy_effectiveness.py`;
+5. optionally re-run RQ3, RQ4, and DevGPT analyses.
+
+See `INSTALL` for concrete commands.
 
 Run the baseline experiment for a single model (5 independent runs per dilemma):
 
@@ -289,9 +325,36 @@ python visualize_results.py \
 ```
 
 The `data_merger.py` helper shows how the *candidates to manually audit* were derived from the CSV outputs of `1_compute_bias_sensitivity.py` (by intersecting cases where the baseline is sensitive and the mitigated setting is not).
+
+## Citation
+
+If you use this package, please cite the paper and acknowledge the *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering* paper:
+```text
+@article{sovrano2026mitigating,
+  title={Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering},
+  author={Sovrano, Francesco and Dominici, Gabriele and Bacchelli, Alberto},
+  journal={Proceedings of the ACM on Software Engineering},
+  year={2026}
+}
+```
+
+As well as the [PROBE-SWE](https://github.com/Francesco-Sovrano/PROB-SWE) benchmark :
+```text
+@article{sovrano2025general,
+  title={Is General-Purpose AI Reasoning Sensitive to Data-Induced Cognitive Biases? Dynamic Benchmarking on Typical Software Engineering Dilemmas},
+  author={Sovrano, Francesco and Dominici, Gabriele and Sevastjanova, Rita and Stramiglio, Alessandra and Bacchelli, Alberto},
+  journal      = {CoRR},
+  url          = {https://doi.org/10.48550/arXiv.2508.11278},
+  doi          = {10.48550/ARXIV.2508.11278},
+  year={2025}
+}
+```
+
+---
+
 ## License
 
-This project is released under the **MIT License** (see `LICENSE`).
+This artefact is released under the **MIT License** (see `LICENSE`).
 
 ---
 

@@ -1,0 +1,60 @@
+Artifact type: software + data + documentation.
+Target venue: FSE 2026 artifact evaluation.
+
+1. Hardware
+- Standard workstation or laptop.
+- Smoke test / offline verification: 4 GB RAM is sufficient.
+- Full API-based reruns are more comfortable with 8 GB+ RAM and several GB of free disk space for caches and outputs.
+- GPU is optional. It may help only for the Hugging Face-based DevGPT classifier path.
+
+2. Operating system
+- Tested with a standard Unix-like shell workflow (Linux/macOS).
+- Windows is also possible with equivalent Python commands; shell examples may need adaptation.
+
+3. Software
+- Python 3.10 or newer.
+- Internet access only for:
+  - API-based controlled experiments;
+  - first-time model downloads for optional HF-based components;
+  - downloading DevGPT externally if reproducing the post-hoc audit.
+
+4. Python dependencies
+Main environment (see `requirements.txt`):
+- pandas
+- tqdm
+- more_itertools
+- ollama
+- openai
+- sentence_transformers
+- matplotlib
+- seaborn
+- statsmodels
+- scikit-learn
+- Levenshtein
+- protobuf>=3.20.3,<5
+- sentencepiece
+- transformers[torch]
+
+Open-ended qualitative-analysis visualization additionally uses the lightweight stack in:
+- `open_ended_dilemma_qualitative_analysis/requirements.txt`
+
+5. Credentials / services
+- `OPENAI_API_KEY` for OpenAI-hosted models such as `gpt-4o-mini`, `gpt-4.1-mini`, and `gpt-4.1-nano`.
+- `GROQ_API_KEY` for Groq-hosted models such as `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, and `deepseek-r1-distill-llama-70b`.
+- The smoke test in `INSTALL` does not require any credentials.
+
+6. Data requirements
+- Full reruns of `1_compute_bias_sensitivity.py` require the benchmark files:
+  - `dataset/augmented_dilemmas_dataset_gpt-4.1-mini.json`
+  - `dataset/augmented_dilemmas_dataset_gpt-4o-mini.json`
+  - `dataset/augmented_dilemmas_dataset_deepseek-r1-distill-llama-70b.json`
+- The DevGPT audit additionally requires an external `DevGPT.zip` download.
+
+7. Storage / runtime expectations
+- Installation and the basic smoke test should take under 30 minutes on a fresh environment.
+- The smoke test typically runs in a few minutes.
+- Full API-based reruns are substantially slower and may incur monetary cost depending on provider, model, and number of runs.
+
+8. Non-standard requirements
+- None required for the smoke test.
+- No Docker or VM is required.
