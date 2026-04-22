@@ -17,6 +17,7 @@ from scipy import stats
 # ---- Force vector text embedding ----
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype']  = 42
+mpl.rcParams["svg.fonttype"] = "none"
 
 DEFAULT_FONTSIZE = 9
 

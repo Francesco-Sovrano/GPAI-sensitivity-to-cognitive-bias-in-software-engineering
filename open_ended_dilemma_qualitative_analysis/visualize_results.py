@@ -22,7 +22,12 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+mpl.rcParams['pdf.fonttype'] = 42
+mpl.rcParams['ps.fonttype']  = 42
+mpl.rcParams["svg.fonttype"] = "none"
 
 
 def smart_read_csv(path: Path) -> pd.DataFrame:

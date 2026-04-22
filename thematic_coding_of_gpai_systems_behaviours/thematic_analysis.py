@@ -5,6 +5,7 @@ from pathlib import Path
 from scipy.stats import norm
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import TwoSlopeNorm
 import textwrap
@@ -13,6 +14,10 @@ from matplotlib.patches import Rectangle
 from matplotlib.lines import Line2D
 import statsmodels.api as sm
 from statsmodels.stats.rates import test_poisson_2indep
+
+mpl.rcParams['pdf.fonttype'] = 42
+mpl.rcParams['ps.fonttype']  = 42
+mpl.rcParams["svg.fonttype"] = "none"
 
 
 
