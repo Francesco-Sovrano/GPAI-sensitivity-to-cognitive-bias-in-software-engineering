@@ -1,4 +1,6 @@
-# Replication Package — Mitigating Prompt‑Induced Cognitive Biases in GPAI for Software Engineering
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19520048.svg)](https://doi.org/10.5281/zenodo.19520048)
+
+# Replication Package — Mitigating Prompt-Induced Cognitive Biases in GPAI for Software Engineering
 
 This repository is the **replication package** for the paper *Mitigating Prompt‑Induced Cognitive Biases in General‑Purpose AI for Software Engineering*. It contains the scripts, data products, annotations, and documentation needed to inspect and reproduce the results reported in the paper across four parts of the study:
 
@@ -14,6 +16,18 @@ A copy of the paper is included in this package as:
 > **Dataset provenance.** The dilemmas and axiomatic backgrounds used for the main experiments come from the **PROBE‑SWE** benchmark (dynamic SE dilemmas with biased/unbiased paired prompts). A dump is included under `./dataset/`, and the original benchmark is available at: <https://github.com/Francesco-Sovrano/PROB-SWE>.
 >
 > The **DevGPT** post‑hoc analysis additionally relies on the external DevGPT dataset (not redistributed here); see the DevGPT section below for download instructions.
+
+---
+
+## Archived artifact
+
+The immutable Zenodo release of this replication package is available at:
+
+- DOI: https://doi.org/10.5281/zenodo.19520048
+- Version: v1.0.0
+- Zenodo record: https://zenodo.org/records/19520048
+
+The GitHub repository is the development version; the Zenodo record should be used for archival citation.
 
 ---
 
@@ -334,7 +348,8 @@ If you use this package, please cite the paper and acknowledge the *Mitigating P
   title={Mitigating Prompt-Induced Cognitive Biases in General-Purpose AI for Software Engineering},
   author={Sovrano, Francesco and Dominici, Gabriele and Bacchelli, Alberto},
   journal={Proceedings of the ACM on Software Engineering},
-  year={2026}
+  year={2026},
+  doi={10.1145/3808115}
 }
 ```
 
